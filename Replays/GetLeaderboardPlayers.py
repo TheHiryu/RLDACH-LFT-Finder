@@ -6,7 +6,7 @@ import cloudscraper
 BASE_URL = "https://rocketleague.tracker.network"
 LEADERBOARD_URL_TEMPLATE = BASE_URL + "/rocket-league/leaderboards/playlist/steam/default?page={page}&playlist=11&country=de"
 
-def get_profile_ids(page):
+def get_profiles(page):
     
     url = LEADERBOARD_URL_TEMPLATE.format(page=page)    
     HEADERS = {
@@ -21,31 +21,33 @@ def get_profile_ids(page):
         return []
 
     website = BeautifulSoup(response.text, 'html.parser')
-    profile_ids = []
+    profiles = []
 
     for a_tag in website.find_all("a", href=True):
-        href = a_tag["href"]
+        href = a_tag.get("href", "")
+
         if href.startswith("/rocket-league/profile/steam/"):
             steam_id = href.split("/")[-1]
-            profile_ids.append(steam_id)
+            username = a_tag.text.strip()
+            profiles.append((steam_id, username))
     
-    return profile_ids
+    return profiles
 
 def scrape_all_pages():
     all_profiles = []
     for page in range(1, 11):
         print(f"Verabreite Seite {page}...")
-        steam_ids = get_profile_ids(page)
-        all_profiles.extend(steam_ids)
+        some_profiles = get_profiles(page)
+        all_profiles.extend(some_profiles)
         time.sleep(1)
 
     return all_profiles
 
 if __name__ == "__main__":
-    steam_ids = scrape_all_pages()
+    all_profiles = scrape_all_pages()
 
-    with open("Top_1000_Players.txt", "w", encoding="utf-8") as f:
-        for steam_id in steam_ids:
-            f.write(steam_id + "\n")
+    with open("Top_Players.txt", "w", encoding="utf-8") as f:
+        for steam_id, username in all_profiles:
+            f.write(f"{steam_id}, {username}\n")
 
-    print(f"Gespeichert: {len(steam_ids)} Links in 'Top_1000_Players.txt'")
+    print(f"Gespeichert: {len(all_profiles)} Links in 'Top_Players.txt'")
