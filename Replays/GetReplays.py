@@ -7,6 +7,16 @@ import time
 HEADERS = {"Authorization": config.API_KEY}
 API_Url = config.API_Url
 
+def start():
+    with open("Top_Players.txt", "r", encoding="utf-8") as f:
+        for line in f.readlines():
+            steam_id = line.split(",")[0]
+            username = line.split(",")[1].strip()
+
+            get_replays(steam_id, username)
+            extract_replay_ids(steam_id, username)
+            get_replay_data(steam_id, username)
+
 
 def get_replays(steam_id, username):
     print(f"Verarbeite Spieler: {username}")
@@ -70,14 +80,3 @@ def get_replay_data(steam_id, username):
 
         except Exception as e:
             print(f"Anderer Fehler bei Spielerdaten {username}: {e}")
-
-
-def start():
-    with open("Top_Players.txt", "r", encoding="utf-8") as f:
-        for line in f.readlines():
-            steam_id = line.split(",")[0]
-            username = line.split(",")[1].strip()
-
-            get_replays(steam_id, username)
-            extract_replay_ids(steam_id, username)
-            get_replay_data(steam_id, username)
