@@ -6,6 +6,16 @@ import cloudscraper
 BASE_URL = "https://rocketleague.tracker.network"
 LEADERBOARD_URL_TEMPLATE = BASE_URL + "/rocket-league/leaderboards/playlist/steam/default?page={page}&playlist=11&country=de"
 
+def start():
+    all_profiles = scrape_all_pages()
+
+    with open("Top_Players.txt", "w", encoding="utf-8") as f:
+        for steam_id, username in all_profiles:
+            f.write(f"{steam_id}, {username}\n")
+
+    print(f"Gespeichert: {len(all_profiles)} Links in 'Top_Players.txt'")
+
+
 def get_profiles(page):
     
     url = LEADERBOARD_URL_TEMPLATE.format(page=page)    
@@ -33,6 +43,7 @@ def get_profiles(page):
     
     return profiles
 
+
 def scrape_all_pages():
     all_profiles = []
     for page in range(1, 11):
@@ -42,12 +53,3 @@ def scrape_all_pages():
         time.sleep(1)
 
     return all_profiles
-
-def start():
-    all_profiles = scrape_all_pages()
-
-    with open("Top_Players.txt", "w", encoding="utf-8") as f:
-        for steam_id, username in all_profiles:
-            f.write(f"{steam_id}, {username}\n")
-
-    print(f"Gespeichert: {len(all_profiles)} Links in 'Top_Players.txt'")
