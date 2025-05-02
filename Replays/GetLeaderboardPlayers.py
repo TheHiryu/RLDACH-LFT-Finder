@@ -13,7 +13,7 @@ def start():
         for steam_id, username in all_profiles:
             f.write(f"{steam_id}, {username}\n")
 
-    print(f"Gespeichert: {len(all_profiles)} Links in 'Top_Players.txt'")
+    print(f"Saved: {len(all_profiles)} profiles in 'Top_Players.txt'")
 
 
 def get_profiles(page):
@@ -27,7 +27,7 @@ def get_profiles(page):
     response = scraper.get(url, headers=HEADERS)
 
     if not response.ok:
-        print(f"Fehler beim Abrufen der Seite {response.status_code}")
+        print(f"Error when requesting website: Error {response.status_code}")
         return []
 
     website = BeautifulSoup(response.text, 'html.parser')
@@ -47,7 +47,7 @@ def get_profiles(page):
 def scrape_all_pages():
     all_profiles = []
     for page in range(1, 11):
-        print(f"Verabreite Seite {page}...")
+        print(f"Processing page {page}...")
         some_profiles = get_profiles(page)
         all_profiles.extend(some_profiles)
         time.sleep(1)

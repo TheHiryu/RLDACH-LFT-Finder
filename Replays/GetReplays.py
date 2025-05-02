@@ -19,7 +19,7 @@ def start():
 
 
 def get_replays(steam_id, username):
-    print(f"Verarbeite Spieler: {username}")
+    print(f"Processing Player: {username}")
     player_url = API_Url.format(steam_id)
 
     try:
@@ -31,10 +31,10 @@ def get_replays(steam_id, username):
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=4)
 
-        print(f"Replay-Daten gespeichert in: {filename}")
+        print(f"Replay data saved in: {filename}")
 
     except Exception as e:
-        print(f"Anderer Fehler bei Spieler {username}: {e}")
+        print(f"Unexpected error while retrieving player data for {username}: {e}")
 
 
 def extract_replay_ids(steam_id, username):
@@ -53,7 +53,7 @@ def extract_replay_ids(steam_id, username):
 
 
 def get_replay_data(steam_id, username):
-    print(f"Daten für Spieler: {username}")
+    print(f"Data for player: {username}")
     
     with open(f"./Replays/Replay Data/{steam_id}_{username}/replay_ids_{steam_id}.json", 'r', encoding='utf-8') as replays:
         replay_ids = json.load(replays)
@@ -63,10 +63,10 @@ def get_replay_data(steam_id, username):
         replay_url = f"https://ballchasing.com/api/replays/{replay_id}"
         Cooldown_Counter += 1
         if Cooldown_Counter % 4 == 0:
-            print("Cooldown von 1 Sekunde...")
+            print("Cooldown for 1 second...")
             time.sleep(1)
         if Cooldown_Counter % 5000 == 0:
-            print("Cooldown von etwa 40 Minuten...")
+            print("Cooldown for about 40 minutes...")
             time.sleep(2350)
         try:
             response = requests.get(replay_url, headers=HEADERS)
@@ -76,7 +76,7 @@ def get_replay_data(steam_id, username):
             with open(filename, 'w', encoding='utf-8') as f:
                 json.dump(data, f, indent=4)
 
-            print(f"Replay-Daten gespeichert in: {filename}")
+            print(f"Replay data saved in: {filename}")
 
         except Exception as e:
-            print(f"Anderer Fehler bei Spielerdaten {username}: {e}")
+            print(f"Unexpected error while retrieving replay data for {username}: {e}")
