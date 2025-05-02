@@ -43,7 +43,7 @@ def scrape_all_pages():
 
     return all_profiles
 
-if __name__ == "__main__":
+def start():
     all_profiles = scrape_all_pages()
 
     with open("Top_Players.txt", "w", encoding="utf-8") as f:
