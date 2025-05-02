@@ -8,14 +8,22 @@ HEADERS = {"Authorization": config.API_KEY}
 API_Url = config.API_Url
 
 def start():
+    cycle = 0
     with open("Top_Players.txt", "r", encoding="utf-8") as f:
         for line in f.readlines():
             steam_id = line.split(",")[0]
             username = line.split(",")[1].strip()
 
+            cycle += 1
+
             get_replays(steam_id, username)
             extract_replay_ids(steam_id, username)
-            get_replay_data(steam_id, username)
+            get_replay_data(steam_id, username, cycle)
+
+            # One cycle consists of 50 replays, so after 5000 replays API cooldown for 1 hour triggers
+            if(cycle % 100 == 0):
+                print("Cooldown for about 40 minutes...")
+                time.sleep(2350)
 
 
 def get_replays(steam_id, username):
@@ -52,7 +60,7 @@ def extract_replay_ids(steam_id, username):
         json.dump(replay_ids, f, indent=4)
 
 
-def get_replay_data(steam_id, username):
+def get_replay_data(steam_id, username, cycle):
     print(f"Data for player: {username}")
     
     with open(f"./Replays/Replay Data/{steam_id}_{username}/replay_ids_{steam_id}.json", 'r', encoding='utf-8') as replays:
@@ -62,12 +70,12 @@ def get_replay_data(steam_id, username):
     for replay_id in replay_ids:
         replay_url = f"https://ballchasing.com/api/replays/{replay_id}"
         Cooldown_Counter += 1
+
+        # Every 4 replays a Cooldown of 1 second is triggered
+        # After 5000 replays a Cooldown of 40 minutes is triggered (see start())
         if Cooldown_Counter % 4 == 0:
             print("Cooldown for 1 second...")
             time.sleep(1)
-        if Cooldown_Counter % 5000 == 0:
-            print("Cooldown for about 40 minutes...")
-            time.sleep(2350)
         try:
             response = requests.get(replay_url, headers=HEADERS)
             data = response.json()
