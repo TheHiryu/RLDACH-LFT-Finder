@@ -72,8 +72,7 @@ def get_replay_data(steam_id, username):
             print(f"Anderer Fehler bei Spielerdaten {username}: {e}")
 
 
-if __name__ == '__main__':
-
+def start():
     with open("Top_Players.txt", "r", encoding="utf-8") as f:
         for line in f.readlines():
             steam_id = line.split(",")[0]
