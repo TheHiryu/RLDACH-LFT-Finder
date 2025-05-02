@@ -6,9 +6,6 @@ import time
 
 HEADERS = {"Authorization": config.API_KEY}
 API_Url = config.API_Url
-steam_ids = [
-    "76561198087548781",
-]
 
 
 def get_replays(steam_id):
@@ -72,9 +69,12 @@ def get_replay_data(steam_id):
             print(f"Anderer Fehler bei Spielerdaten {steam_id}: {e}")
 
 
+if __name__ == '__main__':
+    steam_ids = [
+        "76561198087548781",
+    ]
 
-
-for steam_id in steam_ids:
-    get_replays(steam_id)
-    extract_replay_ids(steam_id)
-    get_replay_data(steam_id)
+    for steam_id in steam_ids:
+        get_replays(steam_id)
+        extract_replay_ids(steam_id)
+        get_replay_data(steam_id)
