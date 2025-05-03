@@ -14,11 +14,14 @@ def start():
             steam_id = line.split(",")[0]
             username = line.split(",")[1].strip()
 
+            # Clean up the username for further usage (Only ASCII Characters below 128)
+            username = ''.join(c for c in username if (ord(c) < 123 and ord(c) not in range(91, 97) and ord(c) not in range(58, 65) and ord(c) not in (32, 34, 42, 46, 47)))
+
             cycle += 1
 
             get_replays(steam_id, username)
             extract_replay_ids(steam_id, username)
-            get_replay_data(steam_id, username, cycle)
+            get_replay_data(steam_id, username)
 
             # One cycle consists of 50 replays, so after 5000 replays API cooldown for 1 hour triggers
             if(cycle % 100 == 0):
@@ -33,9 +36,9 @@ def get_replays(steam_id, username):
     try:
         response = requests.get(player_url, headers=HEADERS)
         data = response.json()
-        os.makedirs(f"./Replays/Replay Data/{steam_id}_{username}", exist_ok=True)
+        os.makedirs(f"./Replay Data/{steam_id}_{username}", exist_ok=True)
 
-        filename = f"./Replays/Replay Data/{steam_id}_{username}/replays_{steam_id}.json"
+        filename = f"./Replay Data/{steam_id}_{username}/replays_{steam_id}.json"
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=4)
 
@@ -48,7 +51,7 @@ def get_replays(steam_id, username):
 def extract_replay_ids(steam_id, username):
     replay_ids = []
     
-    with open(f"./Replays/Replay Data/{steam_id}_{username}/replays_{steam_id}.json", 'r', encoding='utf-8') as replays:
+    with open(f"./Replay Data/{steam_id}_{username}/replays_{steam_id}.json", 'r', encoding='utf-8') as replays:
         data = json.load(replays)
         
         for replay in data["list"]:
@@ -56,14 +59,14 @@ def extract_replay_ids(steam_id, username):
             if(not replay_ids.__contains__(replay_id)):
                 replay_ids.append(replay_id)
 
-    with open(f"./Replays/Replay Data/{steam_id}_{username}/replay_ids_{steam_id}.json", 'w', encoding='utf-8') as f:
+    with open(f"./Replay Data/{steam_id}_{username}/replay_ids_{steam_id}.json", 'w', encoding='utf-8') as f:
         json.dump(replay_ids, f, indent=4)
 
 
-def get_replay_data(steam_id, username, cycle):
+def get_replay_data(steam_id, username):
     print(f"Data for player: {username}")
     
-    with open(f"./Replays/Replay Data/{steam_id}_{username}/replay_ids_{steam_id}.json", 'r', encoding='utf-8') as replays:
+    with open(f"./Replay Data/{steam_id}_{username}/replay_ids_{steam_id}.json", 'r', encoding='utf-8') as replays:
         replay_ids = json.load(replays)
     
     Cooldown_Counter = 0
@@ -80,7 +83,7 @@ def get_replay_data(steam_id, username, cycle):
             response = requests.get(replay_url, headers=HEADERS)
             data = response.json()
             
-            filename = f"./Replays/Replay Data/{steam_id}_{username}/replay_data_{steam_id}_{Cooldown_Counter}.json"
+            filename = f"./Replay Data/{steam_id}_{username}/replay_data_{steam_id}_{Cooldown_Counter}.json"
             with open(filename, 'w', encoding='utf-8') as f:
                 json.dump(data, f, indent=4)
 
