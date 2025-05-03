@@ -4,6 +4,6 @@ import GetReplays
 
 if (__name__ == "__main__"):
 
-    GetLeaderboardPlayers.start()
+    #GetLeaderboardPlayers.start()
     GetReplays.start()
 
