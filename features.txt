@@ -1,87 +1,92 @@
-id
-link
-created
-uploader_steam_id
-uploader_name
-uploader_profile_url
-uploader_avatar
-status
-rocket_league_id
-match_guid
-title
-map_code
-match_type
-team_size
-playlist_id
-duration
-overtime
-overtime_seconds
-season
-season_type
-date
-date_has_timezone
-visibility
-min_rank_id
-min_rank_tier
-min_rank_division
-min_rank_name
-max_rank_id
-max_rank_tier
-max_rank_division
-max_rank_name
-groups_wert
-blue_color
-blue_players_wert
-blue_stats_ball_possession_time
-blue_stats_ball_time_in_side
-blue_stats_core_shots
-blue_stats_core_shots_against
-blue_stats_core_goals
-blue_stats_core_goals_against
-blue_stats_core_saves
-blue_stats_core_assists
-blue_stats_core_score
-blue_stats_core_shooting_percentage
-blue_stats_boost_bpm
-blue_stats_boost_bcpm
-blue_stats_boost_avg_amount
-blue_stats_boost_amount_collected
-blue_stats_boost_amount_stolen
-blue_stats_boost_amount_collected_big
-blue_stats_boost_amount_stolen_big
-blue_stats_boost_amount_collected_small
-blue_stats_boost_amount_stolen_small
-blue_stats_boost_count_collected_big
-blue_stats_boost_count_stolen_big
-blue_stats_boost_count_collected_small
-blue_stats_boost_count_stolen_small
-blue_stats_boost_amount_overfill
-blue_stats_boost_amount_overfill_stolen
-blue_stats_boost_amount_used_while_supersonic
-blue_stats_boost_time_zero_boost
-blue_stats_boost_time_full_boost
-blue_stats_boost_time_boost_0_25
-blue_stats_boost_time_boost_25_50
-blue_stats_boost_time_boost_50_75
-blue_stats_boost_time_boost_75_100
-blue_stats_movement_total_distance
-blue_stats_movement_time_supersonic_speed
-blue_stats_movement_time_boost_speed
-blue_stats_movement_time_slow_speed
-blue_stats_movement_time_ground
-blue_stats_movement_time_low_air
-blue_stats_movement_time_high_air
-blue_stats_movement_time_powerslide
-blue_stats_movement_count_powerslide
-blue_stats_positioning_time_defensive_third
-blue_stats_positioning_time_neutral_third
-blue_stats_positioning_time_offensive_third
-blue_stats_positioning_time_defensive_half
-blue_stats_positioning_time_offensive_half
-blue_stats_positioning_time_behind_ball
-blue_stats_positioning_time_infront_ball
-blue_stats_demo_inflicted
-blue_stats_demo_taken
+id - ID of the Replay
+link - Link of the Replay
+created - Date of Creation
+uploader_steam_id - Steam-ID of the Uploader
+uploader_name - Name of the Uploader
+uploader_profile_url - Profile Link of the Uploader
+uploader_avatar - Avatar of the Uploader
+status - Status of the Replay (ok, pending, failed)
+rocket_league_id - Game-ID in Rocket League
+match_guid - Match GUID given by Rocket League
+title - Title of the Replay
+map_code - Code of the Map this game was played on
+match_type - Type of match (Online, Private, Offline)
+team_size - Number of players in each team
+playlist_id - Name/ID of the playlist this game took place in
+duration - Duration of the Replay in seconds
+overtime - Boolean: Did the game go to overtime
+overtime_seconds - Duration of the Overtime
+season - Season in which this game took place
+season_type - (Obsolete - Used to differentiate between free2play and og seasons. All seasons are f2p since ~2020)
+date - Date the game was played
+date_has_timezone - Boolean: Does this date relate to a timezone
+visibility - Visibility in Ballchasing
+min_rank_id - lowest rank-id in this replay 
+min_rank_tier - lowest tier in this replay (Each rank has its own tier which represents the rank as Integer)
+min_rank_division - division of the lowest rank in this replay
+min_rank_name - Full name of the lowest rank in this replay
+max_rank_id - highest rank-id in this replay
+max_rank_tier - highest tier in this replay (Each rank has its own tier which represents the rank as Integer)
+max_rank_division - division of the highest rank in this replay
+max_rank_name - Full name of the highest rank in this replay
+groups_wert - ?
+blue_color - Color of the team blue (usually, but not always blue)
+blue_players_wert - ?
+blue_stats_ball_possession_time - Time of possesion for team blue (possesion -> last touch was by team blue) 
+blue_stats_ball_time_in_side - Time the ball has spent in the blue teams half
+blue_stats_core_shots - Number of shots team blue/the player has shot
+blue_stats_core_shots_against - Number of shots team blue/the player conceeded
+blue_stats_core_goals - Number of goals team blue/the player scored
+blue_stats_core_goals_against - Number of goals team blue/the player conceeded
+blue_stats_core_saves - Number of saves team blue/the player did
+blue_stats_core_assists - Number of assists team blue/the player did
+blue_stats_core_score - Score team blue has/the player scored
+blue_stats_core_shooting_percentage - Percentage of shots team blue/the player has converted into goals (Can be higher than 100%!)
+blue_stats_boost_bpm - Amount of boost team blue/the player has used per minute (Boost per Minute = bpm)
+blue_stats_boost_bcpm - Amount of boost team blue/the player has collected per minute (Boost collected per Minute = bcpm) (! bpm can be higher than bcpm! )
+blue_stats_boost_avg_amount - Average amount of boost team blue/the player has in its tank at any given time
+blue_stats_boost_amount_collected - Total amount of boost team blue/the player has collected
+blue_stats_boost_amount_stolen - Total amount of boost team blue/the player has collected in the opponents half
+blue_stats_boost_amount_collected_big - Total amount of boost team blue/the player has collected from big boost pills
+blue_stats_boost_amount_stolen_big - Total amount of boost team blue/the player has collected from big boost pills in the opponents half
+blue_stats_boost_amount_collected_small - Total amount of boost team blue/the player has collected from small boost pills
+blue_stats_boost_amount_stolen_small - Total amount of boost team blue/the player has collected from small boost pills in the opponents half
+blue_stats_boost_count_collected_big - Number of big boost pills team blue/the player has collected
+blue_stats_boost_count_stolen_big - Number of big boost pills team blue/the player has collected in the opponents half
+blue_stats_boost_count_collected_small - Number of small boost pills team blue/the player has collected
+blue_stats_boost_count_stolen_small - Number of small boost pills team blue/the player has collected in the opponents half
+blue_stats_boost_amount_overfill - Total amount of boost team blue/the player has collected, but couldn't use, since their tank was already full 
+(Example: If a player with 60 Boost collects a big Boost Pill (100 boost), their tank would fill up to 100, but 60 Boost would count as overfill, since that amount can't be used/collected by the player)
+blue_stats_boost_amount_overfill_stolen - Overfill from collecting boost pills in the opponents half
+blue_stats_boost_amount_used_while_supersonic - Amount of Boost used while already at maximum speed (Using boost while at maximum speed is usually useless, as a player can't get quicker anyways.)
+blue_stats_boost_time_zero_boost - Time team blue/the player has spent with 0 boost
+blue_stats_boost_time_full_boost - Time team blue/the player has spent with 100 boost
+blue_stats_boost_time_boost_0_25 - Time team blue/the player has spent with 0-25 boost
+blue_stats_boost_time_boost_25_50 - Time team blue/the player has spent with 25-50 boost
+blue_stats_boost_time_boost_50_75 - Time team blue/the player has spent with 50-75 boost
+blue_stats_boost_time_boost_75_100 - Time team blue//the player has spent with 75-100 boost
+blue_stats_movement_total_distance - Total Distance team blue/the player has travelled during the game
+blue_stats_movement_time_supersonic_speed - Time team blue/the player has had maximum speed
+blue_stats_movement_time_boost_speed - Time team blue/the player has had a speed between driving speed (speed achieved by normal driving without boosting/flipping) and maximum speed
+blue_stats_movement_time_slow_speed - Time team blue/the player has had a speed below driving speed (speed achieved by normal driving without boosting/flipping)
+blue_stats_movement_time_ground - Time team blue/the player has spent on the ground
+blue_stats_movement_time_low_air - Time team blue/the player has spent in a hight between the ground an crossbar-level
+blue_stats_movement_time_high_air - Time team blue/the player has spent in a hight higher than crossbar-level
+blue_stats_movement_time_powerslide - Time team blue/the player has spent powersliding (Drifting)
+blue_stats_movement_count_powerslide - Number of times the blue team/the player has clicked the powerslide button
+blue_stats_positioning_time_defensive_third - Time team blue/the player has spent in their defensive third of the field
+blue_stats_positioning_time_neutral_third - Time team blue/the player has spend in the neutral third of the field
+blue_stats_positioning_time_offensive_third - Time team blue/the player has spent in their offensive third
+blue_stats_positioning_time_defensive_half - Time team blue/the player has spent in their defensive half
+blue_stats_positioning_time_offensive_half - Time team blue/the player has spent in their offensive half
+blue_stats_positioning_time_behind_ball - Time team blue/the player has spent between the ball and their goal
+blue_stats_positioning_time_infront_ball - Time team blue/the player has spent between the ball and their oppnents goal
+blue_stats_demo_inflicted - Number of demolishions team blue/the player has inflicted on their opponents
+(crashing into an opponents car at max speed -> removes the opponent for 3 seconds from the game)
+blue_stats_demo_taken - Number of times team blue/the player has been demo'd by the opponent
+
+
+---- Same features as for the blue team
 orange_color
 orange_players_wert
 orange_stats_ball_possession_time
@@ -134,11 +139,13 @@ orange_stats_positioning_time_behind_ball
 orange_stats_positioning_time_infront_ball
 orange_stats_demo_inflicted
 orange_stats_demo_taken
-playlist_name
-map_name
-server_name
-server_region
-dateiname
-blue_name
-orange_name
-recorder
+----
+
+playlist_name - Name of the playlist this game was played in
+map_name - Name of the map this game was played on
+server_name - Name of the Server this game was played on
+server_region - Region of the Server this games was played on
+dateiname - Name of the replay
+blue_name - Name of team blue (usually "blue")
+orange_name - Name of team orange (usually "orange")
+recorder - ?
