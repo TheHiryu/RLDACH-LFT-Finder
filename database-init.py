@@ -12,7 +12,9 @@ DB_CONFIG = {
 }
 
 CSV_FILE = './Replays/matches.csv'
-TABLE_NAME = 'replay_stats'
+GRAPH_FOLDER = './plots'
+TABLE_NAME_REPLAYS = 'replay_stats'
+TABLE_NAME_GRAPHS = 'graphs'
 
 
 def infer_pg_type(dtype):
@@ -59,6 +61,33 @@ def insert_data(conn, df, table_name):
         conn.commit()
         os.remove(tmp_csv)
 
+def create_graph_table(conn, table_name):
+    with conn.cursor() as cur:
+        cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(table_name)))
+        cur.execute(sql.SQL("""
+            CREATE TABLE IF NOT EXISTS {} (
+                image_name TEXT,
+                image_data BYTEA
+            );
+        """).format(sql.Identifier(table_name)))
+        conn.commit()
+    conn.close()
+
+def insert_graphs(conn, table_name, folder_path):
+    for filename in os.listdir(folder_path):
+        image_path = os.path.join(folder_path, filename)
+        with open(image_path, 'rb') as f:
+            binary_data = f.read()
+
+        conn = psycopg2.connect(**DB_CONFIG)
+        with conn.cursor() as cur:
+            cur.execute(f"""
+                INSERT INTO {table_name} (image_name, image_data)
+                VALUES (%s, %s);
+            """, (image_path.split('\\')[-1], binary_data))
+            conn.commit()
+        conn.close()
+
 def main():
     print("Lade CSV...")
     df = pd.read_csv(CSV_FILE)
@@ -68,10 +97,18 @@ def main():
     conn = psycopg2.connect(**DB_CONFIG)
 
     print("Erstelle Tabelle...")
-    create_table_from_df(conn, df, TABLE_NAME)
+    create_table_from_df(conn, df, TABLE_NAME_REPLAYS)
 
     print("Importiere Daten...")
-    insert_data(conn, df, TABLE_NAME)
+    insert_data(conn, df, TABLE_NAME_REPLAYS)
+
+    print("Import abgeschlossen.")
+    
+    print("Erstelle Bilderdatenbank")
+    create_graph_table(conn, TABLE_NAME_GRAPHS)
+
+    print("Importiere Graphen")
+    insert_graphs(conn, TABLE_NAME_GRAPHS, GRAPH_FOLDER)
 
     print("Import abgeschlossen.")
     conn.close()
