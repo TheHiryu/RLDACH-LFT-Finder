@@ -1,0 +1,437 @@
+{% extends "base.html" %}
+
+{% block wf_page_id %}spielermatching_page_id{% endblock %} 
+{% block title %}Spielermatching{% endblock %}
+
+{% block meta_tags %}
+  <meta content="Spielermatching Seite" property="og:title">
+  <meta content="Stelle dein Team zusammen" property="twitter:title">
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Stile für den spielermatching-spezifischen Inhalt */
+    .spielermatching-container {
+        display: flex;
+        flex-wrap: wrap; /* Erlaubt Umbruch auf kleineren Bildschirmen, falls nötig */
+        justify-content: space-around; /* Verteilt die Spalten mit Raum drumherum */
+        /* oder justify-content: space-between; für Raum nur zwischen den Spalten */
+        /* oder justify-content: center; und feste Breiten/margins für Spalten */
+        align-items: flex-start; /* Richtet Spalten oben aus */
+        max-width: 1200px;  /* Maximale Breite des gesamten Spielermatching-Bereichs - ANPASSEN! */
+        margin: 20px auto;  /* Zentriert den Bereich horizontal und fügt vertikalen Abstand hinzu */
+        padding: 15px;      /* Innenabstand */
+        /* background-color: rgba(0,0,0,0.2); /* Test-Hintergrund, um den Bereich zu sehen */
+    }
+
+    .team-column {
+        /* width: 48%; */ /* Alte Prozentangabe */
+        flex: 1; /* Lässt die Spalten den verfügbaren Platz gleichmäßig einnehmen */
+        min-width: 300px; /* Mindestbreite, bevor sie untereinander umbrechen (wenn flex-wrap: wrap aktiv) */
+        max-width: 550px; /* Maximale Breite pro Spalte, um zu große Inputs zu vermeiden - ANPASSEN! */
+        margin: 10px; /* Kleiner Abstand zwischen den Spalten, wenn justify-content nicht space-between ist */
+        
+        /* Bestehende Stile für das dunkle Theme sind gut: */
+        background-color: rgba(20,20,30,0.7);
+        padding: 25px; /* Etwas mehr Innenabstand */
+        border-radius: 10px; /* Etwas größerer Radius */
+        color: #f0f0f0;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* Leichter Schatten für Tiefe */
+    }
+
+    .team-column h2 {
+        color: #ffffff;
+        text-align: center;
+        margin-top: 0;
+        margin-bottom: 25px; /* Mehr Abstand unter der Überschrift */
+    }
+
+    .player-input-group {
+        margin-bottom: 20px;
+    }
+
+    .player-input-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500; /* Etwas weniger fett als bold */
+        font-size: 0.95rem;
+    }
+
+    .autocomplete-container {
+        position: relative;
+        width: 100%;
+    }
+
+    .player-input { /* Ihre bestehenden, guten Stile für die Input-Felder */
+        width: 100%;
+        padding: 15px;
+        font-size: 1rem; /* Leicht angepasst für Konsistenz */
+        line-height: 1.4;
+        border-radius: 8px; /* Etwas kleinerer Radius als Spalte */
+        border: 1px solid #555;
+        background-color: rgba(40, 40, 60, 0.8); /* Etwas satterer Hintergrund */
+        color: #ffffff;
+        box-sizing: border-box;
+    }
+
+    .player-input::placeholder {
+        color: #a0a0a0;
+        opacity: 1;
+    }
+
+    .autocomplete-suggestions {
+        position: absolute;
+        border: 1px solid #777;
+        border-top: none;
+        z-index: 999;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background-color: #2c2c3a;
+        color: #f0f0f0;
+        max-height: 150px;
+        overflow-y: auto;
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+
+    .autocomplete-suggestions div {
+        padding: 10px 15px;
+        cursor: pointer;
+        border-bottom: 1px solid #555;
+    }
+    .autocomplete-suggestions div:last-child { border-bottom: none; }
+    .autocomplete-suggestions div:hover { background-color: #4a4a5a; }
+    .autocomplete-active { background-color: #007bff !important; color: #ffffff !important; }
+
+    /* Button und Bestätigungsnachricht zentrieren, wenn sie unter den Spalten stehen */
+    .submit-button-container {
+        width: 100%; /* Nimmt die Breite des .spielermatching-container ein */
+        text-align: center; /* Zentriert den Button, wenn er inline-block ist */
+        margin-top: 30px; /* Abstand nach oben */
+    }
+
+    button#submitTeams {
+        padding: 12px 30px; /* Mehr horizontales Padding */
+        cursor: pointer;
+        background-color: var(--blue, #007bff);
+        color: var(--white, #ffffff);
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 500;
+        /* display: block; margin-left: auto; margin-right: auto; entfernt, da text-align vom Parent genutzt wird */
+        display: inline-block; /* Damit text-align:center wirkt */
+    }
+    button#submitTeams:hover { background-color: #0056b3; }
+    #confirmationMessage { margin-top: 15px; font-weight: bold; /* Farbe wird dynamisch gesetzt */ }
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="spielermatching-container">
+    <div class="team-column">
+        <h2>Team 1</h2>
+        <div id="team1">
+            <div class="player-input-group">
+                <label for="t1p1">Spieler 1:</label>
+                <div class="autocomplete-container">
+                    <input type="text" id="t1p1" class="player-input" data-team="1" data-player-index="0" placeholder="Spieler suchen...">
+                    <div id="suggestions-t1p1" class="autocomplete-suggestions"></div>
+                </div>
+            </div>
+            <div class="player-input-group">
+                <label for="t1p2">Spieler 2:</label>
+                <div class="autocomplete-container">
+                    <input type="text" id="t1p2" class="player-input"  data-team="1" data-player-index="1" placeholder="Spieler suchen...">
+                    <div id="suggestions-t1p2" class="autocomplete-suggestions"></div>
+                </div>
+            </div>
+            <div class="player-input-group">
+                <label for="t1p3">Spieler 3:</label>
+                <div class="autocomplete-container">
+                    <input type="text" id="t1p3" class="player-input" data-team="1" data-player-index="2" placeholder="Spieler suchen...">
+                    <div id="suggestions-t1p3" class="autocomplete-suggestions"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="team-column">
+        <h2>Team 2</h2>
+        <div id="team2">
+            <div class="player-input-group">
+                <label for="t2p1">Spieler 1:</label>
+                <div class="autocomplete-container">
+                    <input type="text" id="t2p1" class="player-input"  data-team="2" data-player-index="0" placeholder="Spieler suchen...">
+                    <div id="suggestions-t2p1" class="autocomplete-suggestions"></div>
+                </div>
+            </div>
+            <div class="player-input-group">
+                <label for="t2p2">Spieler 2:</label>
+                <div class="autocomplete-container">
+                    <input type="text" id="t2p2" class="player-input"  data-team="2" data-player-index="1" placeholder="Spieler suchen...">
+                    <div id="suggestions-t2p2" class="autocomplete-suggestions"></div>
+                </div>
+            </div>
+            <div class="player-input-group">
+                <label for="t2p3">Spieler 3:</label>
+                <div class="autocomplete-container">
+                    <input type="text" id="t2p3" class="player-input"  data-team="2" data-player-index="2" placeholder="Spieler suchen...">
+                    <div id="suggestions-t2p3" class="autocomplete-suggestions"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="submit-button-container"> 
+    <button id="submitTeams">Zusammenstellung bestätigen</button>
+    <div id="confirmationMessage"></div>
+</div>
+
+    <script>
+        // Ihr JavaScript-Code für die Autocomplete-Funktionalität...
+        // Dieser Teil sollte von der letzten funktionierenden Version stammen.
+        // (Der Code für die Autocomplete-Logik selbst muss hier nicht erneut eingefügt werden,
+        //  da er ja laut Ihnen funktioniert – es geht nur ums Layout)
+
+        const playerInputs = document.querySelectorAll('.player-input');
+        const selectedPlayers = new Set(); 
+        const currentValues = {}; 
+
+        let debounceTimer;
+        let activeAutocompleteContainer = null; 
+        let currentFocus = -1; 
+
+        playerInputs.forEach(inputField => {
+            const suggestionsContainerId = `suggestions-${inputField.id}`;
+            const suggestionsContainer = document.getElementById(suggestionsContainerId);
+            if (!suggestionsContainer) { 
+                console.error(`[InitError] Suggestions-Container mit ID ${suggestionsContainerId} nicht gefunden!`);
+                return; 
+            }
+            currentValues[inputField.id] = ""; 
+
+            inputField.addEventListener('focus', function() {
+                activeAutocompleteContainer = suggestionsContainer; 
+                closeAllLists(suggestionsContainer, "[FocusEvent]"); 
+                if (this.value.length > 0) { 
+                    triggerSuggestions(this, suggestionsContainer);
+                }
+            });
+
+            inputField.addEventListener('input', function() {
+                const inputValue = this.value;
+                clearTimeout(debounceTimer);
+                suggestionsContainer.innerHTML = ''; 
+                activeAutocompleteContainer = suggestionsContainer; 
+                currentFocus = -1;
+                
+                if (inputValue.length === 0) { 
+                    const previouslySelected = currentValues[this.id];
+                    if (previouslySelected) {
+                        selectedPlayers.delete(previouslySelected.toLowerCase());
+                        currentValues[this.id] = "";
+                    }
+                    return; 
+                }
+                
+                const minSearchLength = 1; 
+                if (inputValue.length < minSearchLength) { 
+                    return;
+                }
+
+                debounceTimer = setTimeout(() => {
+                    triggerSuggestions(this, suggestionsContainer, inputValue);
+                }, 300);
+            });
+
+            inputField.addEventListener('keydown', function(e) {
+                handleKeyDown(e, this, suggestionsContainer);
+            });
+
+            inputField.addEventListener('change', function() {
+                if (this.value === "" && currentValues[this.id]) {
+                    selectedPlayers.delete(currentValues[this.id].toLowerCase());
+                    currentValues[this.id] = "";
+                }
+            });
+        });
+
+        async function triggerSuggestions(inputElement, suggestionsContainer, query) {
+            if (query === undefined) query = inputElement.value;
+            if (query.length < 1) {
+                suggestionsContainer.innerHTML = '';
+                return;
+            }
+            activeAutocompleteContainer = suggestionsContainer;
+
+            try {
+                const fetchURL = `/api/player_suggestions?q=${encodeURIComponent(query)}`;
+                const response = await fetch(fetchURL);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+                }
+                
+                let serverSuggestions = await response.json();
+                
+                if (activeAutocompleteContainer !== suggestionsContainer) {
+                    return;
+                }
+                suggestionsContainer.innerHTML = '';
+
+                const valueInThisInputLower = currentValues[inputElement.id]?.toLowerCase() || "";
+                const filteredSuggestions = serverSuggestions.filter(serverName => {
+                    const serverNameLower = serverName.toLowerCase();
+                    const isCurrentValueInThisField = serverNameLower === valueInThisInputLower;
+                    const isNotSelectedElsewhere = !selectedPlayers.has(serverNameLower);
+                    return isCurrentValueInThisField || isNotSelectedElsewhere;
+                });
+
+                if (filteredSuggestions.length === 0 && query.length > 0) {
+                    const noSuggestionDiv = document.createElement('div');
+                    noSuggestionDiv.textContent = 'Keine passenden Spieler verfügbar';
+                    noSuggestionDiv.style.padding = '10px';
+                    noSuggestionDiv.style.color = '#aaa';
+                    suggestionsContainer.appendChild(noSuggestionDiv);
+                    return;
+                }
+
+                filteredSuggestions.forEach(name => {
+                    const suggestionDiv = document.createElement('div');
+                    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+                    suggestionDiv.innerHTML = name.replace(regex, '<strong>$1</strong>');
+                    
+                    suggestionDiv.addEventListener('click', function() {
+                        const oldNameInFieldLower = currentValues[inputElement.id]?.toLowerCase();
+                        if (oldNameInFieldLower && oldNameInFieldLower !== name.toLowerCase()) {
+                            selectedPlayers.delete(oldNameInFieldLower);
+                        }
+                        
+                        inputElement.value = name;
+                        currentValues[inputElement.id] = name; 
+                        selectedPlayers.add(name.toLowerCase()); 
+                        closeAllLists("[SuggestionClickEvent]");
+                    });
+                    suggestionsContainer.appendChild(suggestionDiv);
+                });
+            } catch (error) {
+                console.error(`Fehler in triggerSuggestions für Feld ${inputElement.id}:`, error);
+                if (activeAutocompleteContainer === suggestionsContainer) {
+                    suggestionsContainer.innerHTML = '<div style="padding:10px; color:#ffaaaa;">Fehler beim Laden.</div>';
+                }
+            }
+        }
+
+        function handleKeyDown(e, inputElement, suggestionsContainer) {
+            let items = suggestionsContainer.getElementsByTagName("div");
+            if (items.length === 1 && items[0].textContent === 'Keine passenden Spieler verfügbar' && e.keyCode !== 27) {
+                if(e.keyCode === 13) e.preventDefault();
+                return;
+            }
+            if (items.length === 0 && e.keyCode !== 27 && e.keyCode !== 13) return;
+
+            if (e.keyCode == 40) { 
+                currentFocus++;
+                addActive(items);
+            } else if (e.keyCode == 38) { 
+                currentFocus--;
+                addActive(items);
+            } else if (e.keyCode == 13) { 
+                e.preventDefault();
+                if (currentFocus > -1) {
+                    if (items[currentFocus]) items[currentFocus].click();
+                }
+            } else if (e.keyCode == 27) { 
+                closeAllLists("[EscapeKey]");
+            }
+        }
+
+        function addActive(items) {
+            if (!items || items.length === 0) return false;
+            removeActive(items);
+            if (currentFocus >= items.length) currentFocus = 0;
+            if (currentFocus < 0) currentFocus = (items.length - 1);
+            if (items[currentFocus]) { 
+                items[currentFocus].classList.add("autocomplete-active");
+                items[currentFocus].scrollIntoView({ behavior: 'auto', block: 'nearest' });
+            }
+        }
+
+        function removeActive(items) {
+            for (var i = 0; i < items.length; i++) {
+                if (items[i]) items[i].classList.remove("autocomplete-active");
+            }
+        }
+
+        function closeAllLists(source = "[Unknown]", exceptThisContainer = null) { 
+            const allSuggestionContainers = document.querySelectorAll('.autocomplete-suggestions');
+            allSuggestionContainers.forEach(container => {
+                if (container !== exceptThisContainer) {
+                    container.innerHTML = '';
+                }
+            });
+            if (exceptThisContainer === null) {
+                 currentFocus = -1; 
+                 activeAutocompleteContainer = null; 
+            }
+        }
+        
+        document.addEventListener('click', function (e) {
+            let clickedInsideAnAutocompleteWidget = false;
+            playerInputs.forEach(inputField => {
+                const suggestionsBox = document.getElementById(`suggestions-${inputField.id}`);
+                if (inputField.contains(e.target) || (suggestionsBox && suggestionsBox.contains(e.target))) {
+                    clickedInsideAnAutocompleteWidget = true;
+                }
+            });
+            if (!clickedInsideAnAutocompleteWidget) {
+                closeAllLists("[GlobalClickEvent]");
+            }
+        });
+        
+        document.getElementById('submitTeams').addEventListener('click', function() {
+            const teamsData = { team1: [], team2: [] };
+            let allFieldsAreFilled = true; 
+            const tempSelectedInForm = new Set();
+            let duplicateInForm = false;
+
+            playerInputs.forEach(input => {
+                const val = input.value.trim();
+                if (val === "") {
+                    allFieldsAreFilled = false; // Wenn auch nur ein Feld leer ist
+                } else {
+                    if (tempSelectedInForm.has(val.toLowerCase())) {
+                        duplicateInForm = true;
+                    }
+                    tempSelectedInForm.add(val.toLowerCase());
+                }
+                if (input.closest('#team1')) {
+                    teamsData.team1.push(val);
+                } else {
+                    teamsData.team2.push(val);
+                }
+            });
+            
+            const confirmationMessageEl = document.getElementById('confirmationMessage');
+            if (!allFieldsAreFilled) {
+                confirmationMessageEl.textContent = "Bitte füllen Sie alle 6 Spielerfelder aus.";
+                confirmationMessageEl.style.color = "red";
+                return;
+            }
+             if (duplicateInForm) {
+                 confirmationMessageEl.textContent = "Fehler: Ein Spieler wurde mehrfach ausgewählt. Bitte korrigieren.";
+                 confirmationMessageEl.style.color = "red";
+                 return;
+            }
+
+            console.log("Abgesendete Teams:", teamsData);
+            confirmationMessageEl.textContent = "Teams erfolgreich validiert (siehe Konsole)!";
+            confirmationMessageEl.style.color = "green";
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+
+{% block wf_page_id %}spielerstatistiken_page_id{% endblock %}
+{% block title %}Spielerstatistiken{% endblock %}
+
+{% block meta_tags %}
+  <meta content="Spielerstatistiken Seite" property="og:title">
+  <meta content="Alle relevanten Statistiken eines Spielers" property="twitter:title">
+{% endblock %}
+
+{% block extra_css %}
+  <style>
+    /* Globale Stile für den Body kommen aus custom.css via base.html */
+
+    .autocomplete-container {
+        position: relative;
+        margin-bottom: 10px;
+    }
+
+    #playerName {
+        width: 30%;
+        padding: 10px;
+        font-size: 1rem;
+        border-radius: 10px;
+        border: 1px solid #555;
+        background-color: rgba(40, 40, 60, 0.8);
+        color: #ffffff;
+        box-sizing: border-box;
+    }
+    #playerName::placeholder {
+        color: #a0a0a0;
+    }
+
+    #suggestionsList {
+        position: absolute;
+        border: 1px solid #777;
+        border-top: none;
+        z-index: 10000;
+        top: 100%;
+        left: 0;
+        width: 30%; /* Gleiche Breite wie #playerName */
+        background-color: #2c2c3a;
+        color: #f0f0f0;
+        max-height: 150px;
+        overflow-y: auto;
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+        box-sizing: border-box;
+    }
+
+    #suggestionsList div {
+        padding: 10px 15px;
+        cursor: pointer;
+        border-bottom: 1px solid #555;
+        color: #f0f0f0;
+        background-color: #2c2c3a;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    #suggestionsList div:last-child { border-bottom: none; }
+    #suggestionsList div:hover { background-color: #4a4a5a; }
+    #suggestionsList .autocomplete-active {
+        background-color: #007bff !important;
+        color: #ffffff !important;
+    }
+
+    button#submitPlayer {
+        padding: 10px 20px;
+        cursor: pointer;
+        background-color: var(--blue, #007bff);
+        color: var(--white, #ffffff);
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        display: inline-block;
+        margin-top: 10px;
+    }
+    button#submitPlayer:hover { background-color: #0056b3; }
+
+    /* GEMEINSAME KLASSE FÜR DIE INFO-BOXEN */
+    .content-box-style {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: rgba(20,20,30,0.7); /* Dunkelblau/grau, transparent */
+        border-radius: 8px;
+        color: #f0f0f0; /* Heller Text */
+    }
+
+    .content-box-style h2 { /* Stile für H2-Überschriften innerhalb dieser Boxen */
+        color: #ffffff;
+        margin-top: 0;
+        margin-bottom: 10px;
+    }
+
+    .content-box-style p { /* Stile für Paragraphen innerhalb dieser Boxen */
+        line-height: 1.6;
+        margin-bottom: 10px;
+    }
+    /* ENDE GEMEINSAME KLASSE */
+
+  </style>
+{% endblock %}
+
+
+{% block content %}
+  <section class="section template">
+    <div class="w-layout-blockcontainer container space-top-tiny w-container">
+      <div>
+        <div class="space-top-large">
+          <div class="rich-text w-richtext">
+            <h1 style="background-color: transparent;">Spielerstatistiken suchen</h1>
+
+            <form id="playerSearchForm" autocomplete="off">
+                <div class="autocomplete-container">
+                    <label for="playerName" style="display:block; margin-bottom:5px; color: #f0f0f0;">Spielername:</label>
+                    <input type="text" id="playerName" name="playerName" placeholder="Spielernamen eingeben...">
+                    <div id="suggestionsList"></div>
+                </div>
+                <button type="submit" id="submitPlayer">Suchen</button>
+            </form>
+
+            <section class="content-box-style">
+                <h3>Info:</h3>
+                <p>
+                    Hier kannst du nach spezifischen Spielern suchen, um deren detaillierte Statistiken einzusehen.
+                    Gib einfach den Namen des Spielers in das Suchfeld oben ein.
+                </p>
+                <p>
+                    Die angezeigten Statistiken basieren auf den <strong>neuesten verfügbaren Daten </strong>und können dir helfen, die Leistung
+                    und Entwicklung besser zu verstehen.
+                </p>
+                <p>
+                    <em>Hinweis: Die Datenbank wird regelmäßig aktualisiert, um die aktuellsten Informationen bereitzustellen.</em>
+                </p>
+            </section>
+            <div id="playerStatsResult" class="content-box-style">
+                <p>Suche nach einem Spieler, um relevante Statistiken anzuzeigen.</p>
+            </div>
+        
+            <script>
+                const playerNameInput = document.getElementById('playerName');
+                const suggestionsList = document.getElementById('suggestionsList');
+                const playerSearchForm = document.getElementById('playerSearchForm');
+                const playerStatsResult = document.getElementById('playerStatsResult');
+                let currentFocus = -1;
+                let debounceTimer;
+        
+                playerNameInput.addEventListener('input', function(e) {
+                    clearTimeout(debounceTimer);
+                    const inputValue = this.value.trim(); 
+        
+                    if (inputValue.length === 0) {
+                        closeAllLists();
+                        currentFocus = -1;
+                        return; 
+                    }
+                    closeAllLists(); 
+                    currentFocus = -1;
+        
+                    if (inputValue.length < 2) { 
+                        return false;
+                    }
+        
+                    debounceTimer = setTimeout(async () => {
+                        try {
+                            const response = await fetch(`/api/player_suggestions?q=${encodeURIComponent(inputValue)}`);
+                            if (!response.ok) {
+                                const errorText = await response.text();
+                                console.error(`HTTP error! status: ${response.status}`, errorText);
+                                throw new Error(`HTTP error! status: ${response.status}. Server-Antwort: ${errorText}`);
+                            }
+                            const suggestions = await response.json();
+        
+                            if (!suggestionsList) {
+                                console.error("FEHLER: suggestionsList Element nicht gefunden!");
+                                return;
+                            }
+        
+                            if (!Array.isArray(suggestions)) {
+                                console.error("FEHLER: Empfangene Vorschläge sind kein Array!", suggestions);
+                                suggestionsList.innerHTML = '<div style="padding:10px; color:red;">Fehler: Unerwartetes Format der Vorschläge.</div>';
+                                return;
+                            }
+        
+                            if (suggestions.length === 0 && inputValue.length > 0) {
+                                const noSuggestionDiv = document.createElement('div');
+                                noSuggestionDiv.textContent = 'Keine Spieler gefunden';
+                                noSuggestionDiv.style.padding = '10px';
+                                noSuggestionDiv.style.color = '#bbb';
+                                suggestionsList.appendChild(noSuggestionDiv);
+                                return;
+                            }
+        
+                            suggestions.forEach(name => {
+                                if (typeof name !== 'string') {
+                                    console.warn("Ungültiger Name im Vorschlagsarray übersprungen:", name);
+                                    return; 
+                                }
+                                const suggestionDiv = document.createElement('div');
+                                const regex = new RegExp(`(${inputValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+                                suggestionDiv.innerHTML = name.replace(regex, '<strong>$1</strong>');
+                                
+                                suggestionDiv.addEventListener('click', function() {
+                                    playerNameInput.value = name; 
+                                    closeAllLists();
+                                    loadPlayerStats(name); 
+                                });
+                                suggestionsList.appendChild(suggestionDiv);
+                            });
+                        } catch (error) {
+                            console.error("Fehler im Debounce-Callback oder beim Abrufen/Verarbeiten der Spielervorschläge:", error);
+                            if (suggestionsList) {
+                                suggestionsList.innerHTML = `<div style="padding:10px; color:red;">Fehler: ${error.message}</div>`;
+                            }
+                        }
+                    }, 300); 
+                });
+        
+                playerNameInput.addEventListener('keydown', function(e) {
+                    let items = suggestionsList.getElementsByTagName("div");
+                    if (items.length === 0 || (items.length === 1 && items[0].textContent === 'Keine Spieler gefunden')) {
+                        if (e.keyCode === 27) closeAllLists();
+                        return;
+                    }
+        
+                    if (e.keyCode == 40) { 
+                        currentFocus++;
+                        addActive(items);
+                    } else if (e.keyCode == 38) { 
+                        currentFocus--;
+                        addActive(items);
+                    } else if (e.keyCode == 13) { 
+                        e.preventDefault(); 
+                        if (currentFocus > -1) {
+                            if (items[currentFocus]) items[currentFocus].click();
+                        } else if (playerNameInput.value.trim() !== "") { 
+                            loadPlayerStats(playerNameInput.value.trim());
+                            closeAllLists();
+                        }
+                    } else if (e.keyCode == 27) { 
+                        closeAllLists();
+                    }
+                });
+        
+                function addActive(items) {
+                    if (!items || items.length === 0) return false;
+                    removeActive(items);
+                    if (currentFocus >= items.length) currentFocus = 0;
+                    if (currentFocus < 0) currentFocus = (items.length - 1);
+                    if (items[currentFocus]) {
+                        items[currentFocus].classList.add("autocomplete-active");
+                        items[currentFocus].scrollIntoView({ behavior: 'smooth', block: 'nearest' }); 
+                    }
+                }
+        
+                function removeActive(items) {
+                    for (var i = 0; i < items.length; i++) {
+                        if (items[i]) items[i].classList.remove("autocomplete-active");
+                    }
+                }
+        
+                function closeAllLists() {
+                    if (suggestionsList) { 
+                        suggestionsList.innerHTML = '';
+                    }
+                }
+        
+                document.addEventListener('click', function (e) {
+                    if (e.target !== playerNameInput && e.target !== suggestionsList && !suggestionsList.contains(e.target)) {
+                        closeAllLists();
+                    }
+                });
+        
+                async function loadPlayerStats(playerName) {
+                    playerStatsResult.innerHTML = `<p>Lade Statistiken für <strong>${playerName}</strong>...</p>`;
+                    
+                    setTimeout(() => {
+                         playerStatsResult.innerHTML = `<p>Statistiken für <strong>${playerName}</strong> erfolgreich geladen (Beispieldaten). Kills: ${Math.floor(Math.random()*100)}, Tode: ${Math.floor(Math.random()*50)}</p>`;
+                    }, 500); 
+                }
+        
+                playerSearchForm.addEventListener('submit', function(e) {
+                    e.preventDefault(); 
+                    const gesuchterSpieler = playerNameInput.value.trim();
+                    if (gesuchterSpieler) {
+                        closeAllLists(); 
+                        loadPlayerStats(gesuchterSpieler);
+                    } else {
+                        playerStatsResult.innerHTML = "<p>Bitte geben Sie einen Spielernamen ein.</p>";
+                    }
+                });
+        
+            </script>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+ {% endblock %}

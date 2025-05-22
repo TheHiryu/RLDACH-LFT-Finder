@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block wf_page_id %}670ff57a908d3c09f57b179e{% endblock %} {# Die ursprüngliche Webflow Page ID für diese Seite #}
+
+{% block title %}Startseite{% endblock %}
+
+{% block meta_tags %}
+  <meta content="Digital Makers - Webflow HTML website template" property="og:title">
+  <meta content="Digital Makers - Webflow HTML website template" property="twitter:title">
+{% endblock %}
+
+{% block content %}
+    <section class="hero-ribbon-section"><img src="{{ url_for('static', filename='images/dark.jpg') }}"  sizes="100vw" srcset="{{ url_for('static', filename='images/dark-p-500.jpg') }} 500w, {{ url_for('static', filename='images/dark-p-800.jpg') }} 800w, {{ url_for('static', filename='images/dark-p-1080.jpg') }} 1080w, {{ url_for('static', filename='images/dark-p-1600.jpg') }} 1600w, {{ url_for('static', filename='images/dark.jpg') }} 1920w" alt="Hero Hintergrundbild" class="ribbon-image">
+      <div class="center-content center-text">
+        <div class="tag-flex">
+          <div class="title">Dein Portal für Statistiken rund um die top 1000 RocketLeague Spieler</div>
+        </div>
+      </div>
+    </section>
+
+    <section style="padding-bottom: 150px;">
+      <div class="w-layout-blockcontainer container w-container">
+        <div class="center-content center-text">
+          <div class="limit">
+            <div class="title">Spielermatching</div>
+            <p class="medium-text">Auf Grundlage von über <strong>100</strong> Kriterien wird dein perfektes Team vorgeschlagen</p>
+            <a href="{{ url_for('route_spielermatching') }}" class="blue-button w-button">Zum Spielermatching</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section name ="shiawase" class="no-padding-bottom">
+      <div class="w-layout-blockcontainer container w-container">
+        <img sizes="100vw" srcset="{{ url_for('static', filename='images/shiawase-p-500.png') }} 500w, {{ url_for('static', filename='images/shiawase-p-800.png') }} 800w, {{ url_for('static', filename='images/shiawase-p-1080.png') }} 1080w, {{ url_for('static', filename='images/shiawase.png') }} 1543w" alt="Shiawase Bild" src="{{ url_for('static', filename='images/shiawase.png') }}" loading="lazy"> 
+      </div>
+    </section>
+
+    <section id="About" class="section no-padding-bottom">
+      <div class="w-layout-blockcontainer container w-container">
+        <div class="split">
+          <div id="w-node-_71775d44-5aa7-3222-183f-33229d9955db-f57b179e_index"> {# Eindeutige ID für Webflow-Strukturen innerhalb dieser Seite (Suffix '_index' hinzugefügt) #}
+            <div class="title">Quotenmacher</div>
+            <a href="#" class="previous-conference-video w-inline-block w-lightbox">
+              <img src="{{ url_for('static', filename='images/628592.png') }}" loading="lazy" sizes="100vw" alt="Feature Bild">
+            </a>
+          </div>
+          <div id="w-node-_2cbc46b8-a193-6d57-e71f-2526d9e8947f_index"> {# Eindeutige ID #}
+            <h2>Simuliere kommende Spiele</h2>
+            <a href="{{ url_for('route_spielerklassifikation') }}" class="blue-button w-button">Mehr erfahren</a>
+          </div>
+        </div>
+      </div>
+    </section>
+   
+    <div class="section-separator"></div>
+{% endblock %}

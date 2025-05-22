@@ -1,0 +1,6 @@
+services:
+  web:
+    build: .
+    ports:
+      - "5003:5000"  # Geänderter externer Port auf 5003
+   
