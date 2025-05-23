@@ -1,0 +1,23 @@
+<section class="footer">
+    <div class="w-layout-blockcontainer container w-container">
+      <div class="footer-top">
+        <a href="{{ url_for('route_home') }}" aria-current="page" class="w-inline-block w--current">
+            <img width="150" sizes="(max-width: 479px) 67vw, 150px" alt="Logo im Footer" src="{{ url_for('static', filename='images/rocket_league_1.png') }}">
+        </a>
+        <div class="tag-flex vertical">
+          <div class="title no-space-bottom">Deine Rocket League StatPlattform</div>
+          <div class="title no-space-bottom"></div> 
+        </div>
+      </div>
+      <div class="footer-content">
+        <div class="social-logos-wrap">
+          <a href="http://facebook.com" target="_blank" class="social-logo white w-inline-block">
+              <img loading="lazy" src="{{ url_for('static', filename='images/Facebook.svg') }}" alt="Facebook Logo">
+          </a>
+          <a href="http://instagram.com/rocketleague" target="_blank" class="social-logo white w-inline-block">
+              <img loading="lazy" src="{{ url_for('static', filename='images/instagram-logo.svg') }}" alt="Instagram Logo">
+          </a>
+        </div> 
+      </div>
+    </div>
+  </section>

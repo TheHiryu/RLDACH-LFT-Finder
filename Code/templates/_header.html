@@ -1,0 +1,28 @@
+<div data-animation="default" data-collapse="medium" data-duration="400" data-easing="ease" data-easing2="ease" role="banner" class="navbar w-nav">
+    <div class="navbar-contents">
+      <nav role="navigation" id="navbar-main-nav" class="nav-menu w-nav-menu">
+        <a href="{{ url_for('route_stats') }}" class="nav-link">Stats</a>
+        <!-- <a href="{{ url_for('route_spielermatching') }}" class="nav-link">Spielermatching</a> -->
+        <a href="{{ url_for('route_spielerstatistiken') }}" class="nav-link">Spielerstats</a>
+        <a href="{{ url_for('route_quotenmacher') }}" class="nav-link">Quotenmacher</a>
+        <!--
+        <div class="nav-right-content mobile">
+          <a href="{{ url_for('route_stats') }}" class="nav-link">Stats</a> 
+        </div> -->
+      </nav>
+  
+      <a href="{{ url_for('route_home') }}" id="navbar-brand-logo" aria-current="page" class="brand w-nav-brand w--current"> 
+          <img width="150" sizes="(max-width: 479px) 67vw, 150px" alt="Rival Rush Logo" src="{{ url_for('static', filename='images/rocket_league_1.png') }}"> {# Korrigierte Bildgröße und Flask's url_for für statische Dateien #}
+      </a>
+  
+      <div id="navbar-right-section" class="nav-right">
+        <div class="menu-button w-nav-button">
+            <img loading="lazy" src="{{ url_for('static', filename='images/hamburger-white.svg') }}" alt="Menü Icon">
+        </div>
+        <!--
+        <div class="nav-right-content desktop">
+          <a href="{{ url_for('route_stats') }}" class="nav-link">Stats</a> 
+        </div> -->
+      </div>
+    </div>
+  </div> 
