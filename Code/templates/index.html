@@ -1,13 +1,9 @@
 {% extends "base.html" %}
 
-{% block wf_page_id %}670ff57a908d3c09f57b179e{% endblock %} {# Die ursprüngliche Webflow Page ID für diese Seite #}
 
 {% block title %}Startseite{% endblock %}
 
-{% block meta_tags %}
-  <meta content="Digital Makers - Webflow HTML website template" property="og:title">
-  <meta content="Digital Makers - Webflow HTML website template" property="twitter:title">
-{% endblock %}
+
 
 {% block content %}
     <section class="hero-ribbon-section"><img src="{{ url_for('static', filename='images/dark.jpg') }}"  sizes="100vw" srcset="{{ url_for('static', filename='images/dark-p-500.jpg') }} 500w, {{ url_for('static', filename='images/dark-p-800.jpg') }} 800w, {{ url_for('static', filename='images/dark-p-1080.jpg') }} 1080w, {{ url_for('static', filename='images/dark-p-1600.jpg') }} 1600w, {{ url_for('static', filename='images/dark.jpg') }} 1920w" alt="Hero Hintergrundbild" class="ribbon-image">

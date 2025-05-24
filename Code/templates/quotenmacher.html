@@ -10,40 +10,34 @@
 
 {% block extra_css %}
 <style>
-    /* Stile für den spielermatching-spezifischen Inhalt */
     .spielermatching-container {
         display: flex;
-        flex-wrap: wrap; /* Erlaubt Umbruch auf kleineren Bildschirmen, falls nötig */
-        justify-content: space-around; /* Verteilt die Spalten mit Raum drumherum */
-        /* oder justify-content: space-between; für Raum nur zwischen den Spalten */
-        /* oder justify-content: center; und feste Breiten/margins für Spalten */
-        align-items: flex-start; /* Richtet Spalten oben aus */
-        max-width: 1200px;  /* Maximale Breite des gesamten Spielermatching-Bereichs - ANPASSEN! */
-        margin: 20px auto;  /* Zentriert den Bereich horizontal und fügt vertikalen Abstand hinzu */
-        padding: 15px;      /* Innenabstand */
-        /* background-color: rgba(0,0,0,0.2); /* Test-Hintergrund, um den Bereich zu sehen */
+        flex-wrap: wrap; 
+        justify-content: space-around;
+        align-items: flex-start; 
+        max-width: 1200px; 
+        margin: 20px auto; 
+        padding: 15px;   
     }
 
     .team-column {
-        /* width: 48%; */ /* Alte Prozentangabe */
-        flex: 1; /* Lässt die Spalten den verfügbaren Platz gleichmäßig einnehmen */
-        min-width: 300px; /* Mindestbreite, bevor sie untereinander umbrechen (wenn flex-wrap: wrap aktiv) */
-        max-width: 550px; /* Maximale Breite pro Spalte, um zu große Inputs zu vermeiden - ANPASSEN! */
-        margin: 10px; /* Kleiner Abstand zwischen den Spalten, wenn justify-content nicht space-between ist */
+        flex: 1;
+        min-width: 300px; 
+        max-width: 550px; 
+        margin: 10px; 
         
-        /* Bestehende Stile für das dunkle Theme sind gut: */
         background-color: rgba(20,20,30,0.7);
-        padding: 25px; /* Etwas mehr Innenabstand */
-        border-radius: 10px; /* Etwas größerer Radius */
+        padding: 25px;
+        border-radius: 10px; 
         color: #f0f0f0;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* Leichter Schatten für Tiefe */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     }
 
     .team-column h2 {
         color: #ffffff;
         text-align: center;
         margin-top: 0;
-        margin-bottom: 25px; /* Mehr Abstand unter der Überschrift */
+        margin-bottom: 25px; 
     }
 
     .player-input-group {
@@ -53,7 +47,7 @@
     .player-input-group label {
         display: block;
         margin-bottom: 8px;
-        font-weight: 500; /* Etwas weniger fett als bold */
+        font-weight: 500; 
         font-size: 0.95rem;
     }
 
@@ -62,14 +56,14 @@
         width: 100%;
     }
 
-    .player-input { /* Ihre bestehenden, guten Stile für die Input-Felder */
+    .player-input { 
         width: 100%;
         padding: 15px;
-        font-size: 1rem; /* Leicht angepasst für Konsistenz */
+        font-size: 1rem; 
         line-height: 1.4;
-        border-radius: 8px; /* Etwas kleinerer Radius als Spalte */
+        border-radius: 8px; 
         border: 1px solid #555;
-        background-color: rgba(40, 40, 60, 0.8); /* Etwas satterer Hintergrund */
+        background-color: rgba(40, 40, 60, 0.8); 
         color: #ffffff;
         box-sizing: border-box;
     }
@@ -104,15 +98,14 @@
     .autocomplete-suggestions div:hover { background-color: #4a4a5a; }
     .autocomplete-active { background-color: #007bff !important; color: #ffffff !important; }
 
-    /* Button und Bestätigungsnachricht zentrieren, wenn sie unter den Spalten stehen */
     .submit-button-container {
-        width: 100%; /* Nimmt die Breite des .spielermatching-container ein */
-        text-align: center; /* Zentriert den Button, wenn er inline-block ist */
-        margin-top: 30px; /* Abstand nach oben */
+        width: 100%; 
+        text-align: center; 
+        margin-top: 30px; 
     }
 
     button#submitTeams {
-        padding: 12px 30px; /* Mehr horizontales Padding */
+        padding: 12px 30px;
         cursor: pointer;
         background-color: var(--blue, #007bff);
         color: var(--white, #ffffff);
@@ -120,11 +113,10 @@
         border-radius: 8px;
         font-size: 1.1rem;
         font-weight: 500;
-        /* display: block; margin-left: auto; margin-right: auto; entfernt, da text-align vom Parent genutzt wird */
-        display: inline-block; /* Damit text-align:center wirkt */
+        display: inline-block; 
     }
     button#submitTeams:hover { background-color: #0056b3; }
-    #confirmationMessage { margin-top: 15px; font-weight: bold; /* Farbe wird dynamisch gesetzt */ }
+    #confirmationMessage { margin-top: 15px; font-weight: bold;  }
 
 </style>
 {% endblock %}
@@ -193,10 +185,6 @@
 </div>
 
     <script>
-        // Ihr JavaScript-Code für die Autocomplete-Funktionalität...
-        // Dieser Teil sollte von der letzten funktionierenden Version stammen.
-        // (Der Code für die Autocomplete-Logik selbst muss hier nicht erneut eingefügt werden,
-        //  da er ja laut Ihnen funktioniert – es geht nur ums Layout)
 
         const playerInputs = document.querySelectorAll('.player-input');
         const selectedPlayers = new Set(); 

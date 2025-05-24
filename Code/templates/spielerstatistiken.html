@@ -10,7 +10,6 @@
 
 {% block extra_css %}
   <style>
-    /* Globale Stile für den Body kommen aus custom.css via base.html */
 
     .autocomplete-container {
         position: relative;
@@ -79,26 +78,24 @@
     }
     button#submitPlayer:hover { background-color: #0056b3; }
 
-    /* GEMEINSAME KLASSE FÜR DIE INFO-BOXEN */
     .content-box-style {
         margin-top: 20px;
         padding: 15px;
-        background-color: rgba(20,20,30,0.7); /* Dunkelblau/grau, transparent */
+        background-color: rgba(20,20,30,0.7); 
         border-radius: 8px;
-        color: #f0f0f0; /* Heller Text */
+        color: #f0f0f0;
     }
 
-    .content-box-style h2 { /* Stile für H2-Überschriften innerhalb dieser Boxen */
+    .content-box-style h2, .content-box-style h3 { 
         color: #ffffff;
         margin-top: 0;
         margin-bottom: 10px;
     }
 
-    .content-box-style p { /* Stile für Paragraphen innerhalb dieser Boxen */
+    .content-box-style p { 
         line-height: 1.6;
         margin-bottom: 10px;
     }
-    /* ENDE GEMEINSAME KLASSE */
 
   </style>
 {% endblock %}
@@ -125,7 +122,7 @@
                 <h3>Info:</h3>
                 <p>
                     Hier kannst du nach spezifischen Spielern suchen, um deren detaillierte Statistiken einzusehen.
-                    Gib einfach den Namen des Spielers in das Suchfeld oben ein.
+                    Gib einfach den Namen des Spielers in das Suchfeld oben ein und klicke auf "Suchen".
                 </p>
                 <p>
                     Die angezeigten Statistiken basieren auf den <strong>neuesten verfügbaren Daten </strong>und können dir helfen, die Leistung
@@ -138,31 +135,32 @@
             <div id="playerStatsResult" class="content-box-style">
                 <p>Suche nach einem Spieler, um relevante Statistiken anzuzeigen.</p>
             </div>
-        
+
             <script>
                 const playerNameInput = document.getElementById('playerName');
                 const suggestionsList = document.getElementById('suggestionsList');
                 const playerSearchForm = document.getElementById('playerSearchForm');
                 const playerStatsResult = document.getElementById('playerStatsResult');
+
                 let currentFocus = -1;
                 let debounceTimer;
-        
+
                 playerNameInput.addEventListener('input', function(e) {
                     clearTimeout(debounceTimer);
-                    const inputValue = this.value.trim(); 
-        
+                    const inputValue = this.value.trim();
+
                     if (inputValue.length === 0) {
                         closeAllLists();
                         currentFocus = -1;
-                        return; 
+                        return;
                     }
-                    closeAllLists(); 
+                    closeAllLists();
                     currentFocus = -1;
-        
-                    if (inputValue.length < 2) { 
+
+                    if (inputValue.length < 2) {
                         return false;
                     }
-        
+
                     debounceTimer = setTimeout(async () => {
                         try {
                             const response = await fetch(`/api/player_suggestions?q=${encodeURIComponent(inputValue)}`);
@@ -172,18 +170,16 @@
                                 throw new Error(`HTTP error! status: ${response.status}. Server-Antwort: ${errorText}`);
                             }
                             const suggestions = await response.json();
-        
+
                             if (!suggestionsList) {
                                 console.error("FEHLER: suggestionsList Element nicht gefunden!");
                                 return;
                             }
-        
                             if (!Array.isArray(suggestions)) {
                                 console.error("FEHLER: Empfangene Vorschläge sind kein Array!", suggestions);
                                 suggestionsList.innerHTML = '<div style="padding:10px; color:red;">Fehler: Unerwartetes Format der Vorschläge.</div>';
                                 return;
                             }
-        
                             if (suggestions.length === 0 && inputValue.length > 0) {
                                 const noSuggestionDiv = document.createElement('div');
                                 noSuggestionDiv.textContent = 'Keine Spieler gefunden';
@@ -192,20 +188,19 @@
                                 suggestionsList.appendChild(noSuggestionDiv);
                                 return;
                             }
-        
+
                             suggestions.forEach(name => {
                                 if (typeof name !== 'string') {
                                     console.warn("Ungültiger Name im Vorschlagsarray übersprungen:", name);
-                                    return; 
+                                    return;
                                 }
                                 const suggestionDiv = document.createElement('div');
                                 const regex = new RegExp(`(${inputValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
                                 suggestionDiv.innerHTML = name.replace(regex, '<strong>$1</strong>');
-                                
+
                                 suggestionDiv.addEventListener('click', function() {
-                                    playerNameInput.value = name; 
+                                    playerNameInput.value = name;
                                     closeAllLists();
-                                    loadPlayerStats(name); 
                                 });
                                 suggestionsList.appendChild(suggestionDiv);
                             });
@@ -215,35 +210,37 @@
                                 suggestionsList.innerHTML = `<div style="padding:10px; color:red;">Fehler: ${error.message}</div>`;
                             }
                         }
-                    }, 300); 
+                    }, 300);
                 });
-        
+
                 playerNameInput.addEventListener('keydown', function(e) {
                     let items = suggestionsList.getElementsByTagName("div");
                     if (items.length === 0 || (items.length === 1 && items[0].textContent === 'Keine Spieler gefunden')) {
                         if (e.keyCode === 27) closeAllLists();
                         return;
                     }
-        
-                    if (e.keyCode == 40) { 
+
+                    if (e.keyCode == 40) { //pfeil hoch
                         currentFocus++;
                         addActive(items);
-                    } else if (e.keyCode == 38) { 
+                    } else if (e.keyCode == 38) {  // pfeil runter
                         currentFocus--;
                         addActive(items);
-                    } else if (e.keyCode == 13) { 
-                        e.preventDefault(); 
+                    } else if (e.keyCode == 13) { // Enter
+                        e.preventDefault();
                         if (currentFocus > -1) {
-                            if (items[currentFocus]) items[currentFocus].click();
-                        } else if (playerNameInput.value.trim() !== "") { 
-                            loadPlayerStats(playerNameInput.value.trim());
-                            closeAllLists();
+                            if (items[currentFocus]) {
+                                playerNameInput.value = items[currentFocus].textContent;
+                                closeAllLists();
+                            }
+                        } else {
+                            playerSearchForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
                         }
-                    } else if (e.keyCode == 27) { 
+                    } else if (e.keyCode == 27) { // Escape
                         closeAllLists();
                     }
                 });
-        
+
                 function addActive(items) {
                     if (!items || items.length === 0) return false;
                     removeActive(items);
@@ -251,47 +248,87 @@
                     if (currentFocus < 0) currentFocus = (items.length - 1);
                     if (items[currentFocus]) {
                         items[currentFocus].classList.add("autocomplete-active");
-                        items[currentFocus].scrollIntoView({ behavior: 'smooth', block: 'nearest' }); 
+                        items[currentFocus].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                     }
                 }
-        
+
                 function removeActive(items) {
                     for (var i = 0; i < items.length; i++) {
                         if (items[i]) items[i].classList.remove("autocomplete-active");
                     }
                 }
-        
+
                 function closeAllLists() {
-                    if (suggestionsList) { 
+                    if (suggestionsList) {
                         suggestionsList.innerHTML = '';
                     }
                 }
-        
+
                 document.addEventListener('click', function (e) {
                     if (e.target !== playerNameInput && e.target !== suggestionsList && !suggestionsList.contains(e.target)) {
                         closeAllLists();
                     }
                 });
-        
+
                 async function loadPlayerStats(playerName) {
                     playerStatsResult.innerHTML = `<p>Lade Statistiken für <strong>${playerName}</strong>...</p>`;
-                    
-                    setTimeout(() => {
-                         playerStatsResult.innerHTML = `<p>Statistiken für <strong>${playerName}</strong> erfolgreich geladen (Beispieldaten). Kills: ${Math.floor(Math.random()*100)}, Tode: ${Math.floor(Math.random()*50)}</p>`;
-                    }, 500); 
+
+                    try {
+                        const response = await fetch(`/api/get_player_analysis_data?playerName=${encodeURIComponent(playerName)}`);
+
+                        if (!response.ok) {
+                            const errorText = await response.text();
+                            throw new Error(`Fehler beim Abrufen der Spielerdaten: ${response.status} ${errorText}`);
+                        }
+
+                        const data = await response.json();
+                        playerStatsResult.innerHTML = ''; // Vorherigen Inhalt leeren
+
+                        const heading = document.createElement('h3');
+                        heading.textContent = `Statistiken für ${data.playerName || playerName}`;
+                        playerStatsResult.appendChild(heading);
+
+                        if (data.textAnalysis) {
+                            const analysisParagraph = document.createElement('p');
+                            analysisParagraph.innerHTML = data.textAnalysis;
+                            playerStatsResult.appendChild(analysisParagraph);
+                        }
+
+                        if (data.diagramPaths && Array.isArray(data.diagramPaths)) {
+                            data.diagramPaths.forEach(path => {
+                                const imgContainer = document.createElement('div');
+                                imgContainer.style.margin = "10px 0";
+                                const img = document.createElement('img');
+                                img.src = path;
+                                img.alt = `Diagramm für ${data.playerName || playerName}`;
+                                img.style.maxWidth = "100%";
+                                img.style.height = "auto";
+                                imgContainer.appendChild(img);
+                                playerStatsResult.appendChild(imgContainer);
+                            });
+                        }
+
+                        if (!data.textAnalysis && (!data.diagramPaths || data.diagramPaths.length === 0)) {
+                            playerStatsResult.innerHTML = `<p>Keine detaillierten Statistiken oder Diagramme für <strong>${playerName}</strong> gefunden.</p>`;
+                        }
+
+                    } catch (error) {
+                        console.error("Fehler in loadPlayerStats:", error);
+                        playerStatsResult.innerHTML = `<p style="color:red;">Fehler beim Laden der Statistiken für <strong>${playerName}</strong>: ${error.message}</p>`;
+                    }
                 }
-        
+
                 playerSearchForm.addEventListener('submit', function(e) {
-                    e.preventDefault(); 
+                    e.preventDefault();
                     const gesuchterSpieler = playerNameInput.value.trim();
                     if (gesuchterSpieler) {
-                        closeAllLists(); 
+                        closeAllLists();
                         loadPlayerStats(gesuchterSpieler);
                     } else {
                         playerStatsResult.innerHTML = "<p>Bitte geben Sie einen Spielernamen ein.</p>";
                     }
                 });
-        
+
             </script>
           </div>
         </div>

@@ -76,9 +76,9 @@
   }
 
   .stats-diagram {
-    flex-basis: calc(60% - 10px); /* Erhöht für größere Bilder */
-    max-width: calc(60% - 10px);  /* Erhöht für größere Bilder */
-    min-width: 300px; /* Mindestbreite für die Diagramme */
+    flex-basis: calc(60% - 10px); 
+    max-width: calc(60% - 10px);  
+    min-width: 300px; 
     text-align: center; 
   }
 
@@ -97,20 +97,19 @@
     margin-top: 5px;
   }
 
-  /* Für mittelgroße Bildschirme (z.B. Tablets) */
   @media screen and (max-width: 991px) {
     .stats-diagram {
-      flex-basis: calc(80% - 10px); /* Bilder nehmen mehr Breite ein */
+      flex-basis: calc(80% - 10px); 
       max-width: calc(80% - 10px);
     }
   }
 
-  /* Für kleinere Bildschirme (z.B. Smartphones) */
+  /* Für kleinere Bildschirme */
   @media screen and (max-width: 767px) {
     .stats-diagram {
-      flex-basis: 100%; /* Volle Breite */
+      flex-basis: 100%; 
       max-width: 100%;
-      min-width: 0; /* Mindestbreite aufheben für sehr kleine Screens */
+      min-width: 0; 
     }
   }
 

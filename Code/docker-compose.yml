@@ -1,4 +1,4 @@
-version: '3.8'
+#version: '3.8'
 services:
   postgres:
     image: postgres:15
@@ -13,7 +13,7 @@ services:
       - pgdata:/var/lib/postgresql/data
   
   web:
-    build: app.py
+    build: .
     ports:
       - "5003:5000"  # Geänderter externer Port auf 5003
 
