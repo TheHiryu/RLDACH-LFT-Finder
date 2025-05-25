@@ -12,7 +12,7 @@ DB_CONFIG = {
 }
 
 CSV_FILE_REPLAYS = './Replays/matches.csv'
-CSV_FILE_PLAYER = './DASC mit Claudia/player_probs.csv'
+CSV_FILE_PLAYER = './DASC/player_probs.csv'
 GRAPH_FOLDER = './plots'
 TABLE_NAME_REPLAYS = 'replay_stats'
 TABLE_NAME_PLAYER = 'player_stats'
