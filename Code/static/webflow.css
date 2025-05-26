@@ -197,8 +197,12 @@ body{
         color:#222;padding:20px;
         text-align:left;
         margin-left:auto;
-        margin-right:auto
+        margin-right:auto;
+        transition: color 0.5s ease; 
       }
+      .w-nav-link:hover {
+    color: #4da8ff; 
+}
       .w-nav-link.w--current{color:#0082f3}
       .w-nav-menu{
         position:relative;
