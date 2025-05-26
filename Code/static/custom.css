@@ -107,3 +107,34 @@ body {
 main.content-wrapper {
   padding-top: 250px; 
 }
+
+
+
+#About {
+    padding-top: 80px;
+    padding-bottom: 80px; 
+}
+
+#About .split {
+    grid-column-gap: 40px; 
+    align-items: center;  
+}
+
+#w-node-_2cbc46b8-a193-6d57-e71f-2526d9e8947f_index {
+    display: flex;              
+    flex-direction: column;    
+    justify-content: center;    
+    align-items: flex-start;   
+    padding: 20px;             
+    box-sizing: border-box;    
+}
+
+.rl-website-link {
+    text-decoration: none; 
+    color: white;         
+    transition: color 0.5s ease; 
+}
+
+.rl-website-link:hover {
+    color: #4da8ff; 
+}
