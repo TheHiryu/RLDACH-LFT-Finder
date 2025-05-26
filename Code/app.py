@@ -119,23 +119,13 @@ def player_stats():
         
         conn = psycopg2.connect(**DB_CONFIG)
         cur = conn.cursor()
-
-    except Exception as e:
-        print(f"Fehler bei DB-Zugriff: {e}")
-        return jsonify({'error': f"Fehler bei DB-Zugriff: {e}"}), 500
     
-    try:
         cur.execute("""
                     SELECT player_id 
                     FROM replay_stats
                     WHERE name = %s
                     """, (player_name,))
-        
-    except Exception as e:
-        print(f"Fehler bei DB-Zugriff: {e}")
-        return jsonify({'error': 'Serverfehler beim Abrufen der Daten1'}), 500
 
-    try:
         result = cur.fetchone()
 
         player_id = result[0]
@@ -150,26 +140,21 @@ def player_stats():
         """, (player_id,))
 
         playstyles = cur.fetchone()
-
-    except Exception as e:
-        print(f"Fehler bei DB-Zugriff: {e}")
-        return jsonify({'error': 'Serverfehler beim Abrufen der Daten2'}), 500
     
-    try:
         cur.close()
         conn.close()
 
         if playstyles is None:
             return jsonify({'error': 'Keine Statistiken für diesen Spieler gefunden'}), 404
         
-        labels = ['Spielstil 1', 'Spielstil 2', 'Spielstil 3', 'Spielstil 4']
+        labels = ['Fast Attacker, 1st man', 'Konterspieler, 2nd man', 'Libero, 3rd man', 'Mixed Style']
         values = list(playstyles)
 
         return jsonify({'labels': labels, 'values': values})
 
     except Exception as e:
         print(f"Fehler bei DB-Zugriff: {e}")
-        return jsonify({'error': 'Serverfehler beim Abrufen der Daten'}), 500
+        return jsonify({'error': f"Fehler bei DB-Zugriff: {e}"}), 500
 
 
 # --- Alte Routen (können auskommentiert oder entfernt werden, da nicht mehr im Hauptmenü) ---
