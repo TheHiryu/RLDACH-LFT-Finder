@@ -274,48 +274,96 @@
                     playerStatsResult.innerHTML = `<p>Lade Statistiken für <strong>${playerName}</strong>...</p>`;
 
                     try {
-                        const response = await fetch(`/api/get_player_analysis_data?playerName=${encodeURIComponent(playerName)}`);
+                        const response = await fetch('/api/player_stats', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ name: playerName })
+                        });
 
                         if (!response.ok) {
                             const errorText = await response.text();
-                            throw new Error(`Fehler beim Abrufen der Spielerdaten: ${response.status} ${errorText}`);
+                            throw new Error(`Fehler beim Abrufen der Daten: ${errorText}`);
                         }
 
                         const data = await response.json();
-                        playerStatsResult.innerHTML = ''; // Vorherigen Inhalt leeren
 
-                        const heading = document.createElement('h3');
-                        heading.textContent = `Statistiken für ${data.playerName || playerName}`;
-                        playerStatsResult.appendChild(heading);
+                        playerStatsResult.innerHTML = `<canvas id="barChart" width="400" height="200"></canvas>`;
 
-                        if (data.textAnalysis) {
-                            const analysisParagraph = document.createElement('p');
-                            analysisParagraph.innerHTML = data.textAnalysis;
-                            playerStatsResult.appendChild(analysisParagraph);
+                        const diagram = document.getElementById('barChart').getContext('2d');
+                        new Chart(diagram, {
+                            type: 'bar',
+                            data: {
+                                labels: data.labels,
+                                datasets: [{
+                                    label: `Statistiken für ${playerName}`,
+                                    data: data.values,
+                                    backgroundColor: [
+                                        'rgba(54, 162, 235, 0.6)',   // Blau
+                                        'rgba(255, 99, 132, 0.6)',   // Rot
+                                        'rgba(102, 205, 0, 0.6)',    // Grün
+                                        'rgba(154, 50, 205, 0.6)'    // Lila
+                                    ],
+                                    borderColor: [
+                                        'rgba(54, 162, 235, 1)',   // Blau
+                                        'rgba(255, 99, 132, 1)',   // Rot
+                                        'rgba(102, 205, 0, 1)',    // Grün
+                                        'rgba(154, 50, 205, 1)'    // Lila
+                                    ],
+                                    hoverBackgroundColor: [
+                                        'rgba(54, 162, 235, 0.8)',   // Blau
+                                        'rgba(255, 99, 132, 0.8)',   // Rot
+                                        'rgba(102, 205, 0, 0.8)',    // Grün
+                                        'rgba(154, 50, 205, 0.8)'    // Lila
+                                    ],
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    y: {
+                                        min: 0.1,
+                                        max: Math.max(...data.values),
+                                        ticks: {
+                                            callback: function(value) {
+                                                return Math.round(value * 250) + '%';
+                                            }
+                                        }
+                                    }
+                                },
+                                plugins: {
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(context) {
+                                                const rawValue = context.raw;
+                                                const percentage = Math.round(rawValue * 250);
+                                                return `${context.label}: ${percentage}%`;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        })
+
+                        const maxValue = Math.max(...data.values);
+                        const maxIndex = data.values.indexOf(maxValue);
+                        const maxLabel = data.labels[maxIndex];
+                        const percentage = Math.round(maxValue * 250);
+
+                        // Textanzeige erzeugen
+                        const resultText = document.createElement('p');
+                        resultText.style.marginTop = '15px';
+                        resultText.style.fontWeight = 'bold';
+                        resultText.style.color = '#ffffff';
+                        resultText.textContent = `Du bist zu ${percentage}% ${maxLabel}`;
+
+                        playerStatsResult.appendChild(resultText);
+
+                        } catch (error) {
+                            console.error("Fehler in loadPlayerStats:", error);
+                            playerStatsResult.innerHTML = `<p style="color:red;">Fehler beim Laden der Statistiken für <strong>${playerName}</strong>: ${error.message}</p>`;
                         }
-
-                        if (data.diagramPaths && Array.isArray(data.diagramPaths)) {
-                            data.diagramPaths.forEach(path => {
-                                const imgContainer = document.createElement('div');
-                                imgContainer.style.margin = "10px 0";
-                                const img = document.createElement('img');
-                                img.src = path;
-                                img.alt = `Diagramm für ${data.playerName || playerName}`;
-                                img.style.maxWidth = "100%";
-                                img.style.height = "auto";
-                                imgContainer.appendChild(img);
-                                playerStatsResult.appendChild(imgContainer);
-                            });
-                        }
-
-                        if (!data.textAnalysis && (!data.diagramPaths || data.diagramPaths.length === 0)) {
-                            playerStatsResult.innerHTML = `<p>Keine detaillierten Statistiken oder Diagramme für <strong>${playerName}</strong> gefunden.</p>`;
-                        }
-
-                    } catch (error) {
-                        console.error("Fehler in loadPlayerStats:", error);
-                        playerStatsResult.innerHTML = `<p style="color:red;">Fehler beim Laden der Statistiken für <strong>${playerName}</strong>: ${error.message}</p>`;
-                    }
                 }
 
                 playerSearchForm.addEventListener('submit', function(e) {

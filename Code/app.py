@@ -1,12 +1,10 @@
 
 
-import os
+
 from flask import Flask, render_template, request, redirect, jsonify
-import asyncio
-from discord import Webhook # Falls noch für andere Funktionen benötigt
-import aiohttp
+# from discord import Webhook - Falls noch für andere Funktionen benötigt
 import random
-import json
+import psycopg2
 
 app = Flask(__name__)
 
@@ -102,6 +100,76 @@ def player_suggestions():
     ][:10]
     return jsonify(suggestions)
 
+@app.route('/api/player_stats', methods = ['POST'])
+def player_stats():
+    data = request.get_json()
+    player_name = data.get('name', '').strip()
+
+    if not player_name:
+        return jsonify({'error': 'Kein Spielername angegeben'}), 400
+    
+    try:
+        DB_CONFIG = {
+            'dbname': 'RLReplays',
+            'user': 'postgres',
+            'password': 'postgres',
+            'host': 'db',
+            'port': 5432
+        }
+        
+        conn = psycopg2.connect(**DB_CONFIG)
+        cur = conn.cursor()
+
+    except Exception as e:
+        print(f"Fehler bei DB-Zugriff: {e}")
+        return jsonify({'error': f"Fehler bei DB-Zugriff: {e}"}), 500
+    
+    try:
+        cur.execute("""
+                    SELECT player_id 
+                    FROM replay_stats
+                    WHERE name = %s
+                    """, (player_name,))
+        
+    except Exception as e:
+        print(f"Fehler bei DB-Zugriff: {e}")
+        return jsonify({'error': 'Serverfehler beim Abrufen der Daten1'}), 500
+
+    try:
+        result = cur.fetchone()
+
+        player_id = result[0]
+
+        if result is None:
+            return jsonify({'error': 'Spielername nicht gefunden'}), 404
+
+        cur.execute("""
+            SELECT prob_cluster_0_median, prob_cluster_1_median, prob_cluster_2_median, prob_cluster_3_median 
+            FROM player_stats 
+            WHERE player_id = %s
+        """, (player_id,))
+
+        playstyles = cur.fetchone()
+
+    except Exception as e:
+        print(f"Fehler bei DB-Zugriff: {e}")
+        return jsonify({'error': 'Serverfehler beim Abrufen der Daten2'}), 500
+    
+    try:
+        cur.close()
+        conn.close()
+
+        if playstyles is None:
+            return jsonify({'error': 'Keine Statistiken für diesen Spieler gefunden'}), 404
+        
+        labels = ['Spielstil 1', 'Spielstil 2', 'Spielstil 3', 'Spielstil 4']
+        values = list(playstyles)
+
+        return jsonify({'labels': labels, 'values': values})
+
+    except Exception as e:
+        print(f"Fehler bei DB-Zugriff: {e}")
+        return jsonify({'error': 'Serverfehler beim Abrufen der Daten'}), 500
 
 
 # --- Alte Routen (können auskommentiert oder entfernt werden, da nicht mehr im Hauptmenü) ---
