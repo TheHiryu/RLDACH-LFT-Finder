@@ -11,9 +11,11 @@ DB_CONFIG = {
     'port': 5432
 }
 
-CSV_FILE = './Replays/matches.csv'
+CSV_FILE_REPLAYS = './Replays/matches.csv'
+CSV_FILE_PLAYER = './DASC/player_probs.csv'
 GRAPH_FOLDER = './plots'
 TABLE_NAME_REPLAYS = 'replay_stats'
+TABLE_NAME_PLAYER = 'player_stats'
 TABLE_NAME_GRAPHS = 'graphs'
 
 
@@ -61,6 +63,7 @@ def insert_data(conn, df, table_name):
         conn.commit()
         os.remove(tmp_csv)
 
+
 def create_graph_table(conn, table_name):
     with conn.cursor() as cur:
         cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(table_name)))
@@ -89,21 +92,31 @@ def insert_graphs(conn, table_name, folder_path):
         conn.close()
 
 def main():
-    print("Lade CSV...")
-    df = pd.read_csv(CSV_FILE)
-    print(f"CSV geladen mit {len(df)} Zeilen und {len(df.columns)} Spalten.")
+    print("Lade Replay CSV...")
+    df_replays = pd.read_csv(CSV_FILE_REPLAYS)
+    print(f"CSV geladen mit {len(df_replays)} Zeilen und {len(df_replays.columns)} Spalten.")
 
     print("Verbinde mit Datenbank...")
     conn = psycopg2.connect(**DB_CONFIG)
 
-    print("Erstelle Tabelle...")
-    create_table_from_df(conn, df, TABLE_NAME_REPLAYS)
+    print("Erstelle Replay-Tabelle...")
+    create_table_from_df(conn, df_replays, TABLE_NAME_REPLAYS)
 
     print("Importiere Daten...")
-    insert_data(conn, df, TABLE_NAME_REPLAYS)
+    insert_data(conn, df_replays, TABLE_NAME_REPLAYS)
 
     print("Import abgeschlossen.")
     
+    print("Lade Player CSV...")
+    df_player = pd.read_csv(CSV_FILE_PLAYER)
+    print(f"CSV geladen mit {len(df_player)} Zeilen und {len(df_player.columns)} Spalten.")
+
+    print("Erstelle Spielertabelle")
+    create_table_from_df(conn, df_player, TABLE_NAME_PLAYER)
+
+    print("Importiere Daten...")
+    insert_data(conn, df_player, TABLE_NAME_PLAYER)
+
     print("Erstelle Bilderdatenbank")
     create_graph_table(conn, TABLE_NAME_GRAPHS)
 
