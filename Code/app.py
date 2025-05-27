@@ -19,6 +19,20 @@ if len(player_names_list_from_backend) < 50:
 def route_home(): # Endpunktname für url_for in base.html/_header.html/_footer.html
     return render_template('index.html')
 
+# --- Neue Routen basierend auf der aktualisierten Navigation ---
+@app.route('/spielermatching')
+def route_spielermatching():
+    # Hier kommt die Logik für die Spielermatching-Seite
+    # Erstellen Sie eine Datei templates/spielermatching.html
+    return render_template('spielermatching.html', page_id="spielermatching_page", site_id="main_site")
+
+@app.route('/spielerklassifikation')
+def route_spielerklassifikation():
+    # Hier kommt die Logik für die Spielerklassifikation-Seite
+    # Sie hatten diese Route in der vorherigen index.html als 'spielerstatistiken'
+    # Ich nehme an, das Template heißt nun spielerklassifikation.html
+    # Erstellen Sie eine Datei templates/spielerklassifikation.html
+    return render_template('spielerklassifikation.html', page_id="spielerklassifikation_page", site_id="main_site")
 
 @app.route('/quotenmacher')
 def route_quotenmacher():
