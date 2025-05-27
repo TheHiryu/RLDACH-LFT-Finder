@@ -346,6 +346,25 @@
                             }
                         })
 
+                        const spielstilTexte = {
+                            'Fast Attacker, 1st man': {
+                                titel: 'Fast Attacker (1st man)',
+                                beschreibung: 'Der 1st man hat üblicherweise die Rolle, dem Gegner die Ballkontrolle abzunehmen, um so schnell nach verlorenem Ballbesitz wieder in den Angriff zu kommen und weiterhin offensiven Druck aufrechtzuerhalten. Dazu ist ein aggresiver, tempoorientierter Spielstil mit hoher Boostnutzung und bedachter Boostkontrolle notwendig. Du sucht ständig nach schnellen Angriffsmöglichkeiten, bleibst nah am Ball und suchst mit Demos und Geschwindigkeit ständig nach Torchancen im Angriffsdrittel.'
+                            },
+                            'Konterspieler, 2nd man': {
+                                titel: 'Konterspieler (2nd man)',
+                                beschreibung: 'Ein 2nd man ist stets dafür da, den 1st man zu unterstützen und Ballverluste vom Gegner zu bestrafen und schnell aus der Defensive in die Offensive umzuschalten. Nach einem Ballgewinn in der Defensive bist du schnell bereit, lange Bälle deiner Teammates zu verwerten oder selbst einen Schuss aus der eigenen Hälfte zu versuchen. Meist zeigt sich das durch eine hohe Distanz zum Ball und eher moderatem Boosteinsatz.'
+                            },
+                            'Libero, 3rd man': {
+                                titel: 'Libero (3rd man)',
+                                beschreibung: 'Der 3rd man ist der Defensivanker mit klarer Priorität auf Absicherung und Raumkontrolle aus dem letzten Drittel. Zuverlässige CLears und präzise lange Pässe zeichnen einen guten 3rd man aus. Somit nutzt du schlechte Clears des Gegnerteams schnell und effektiv , indem du seine beiden Teammates in Szene setzt und gleichzeitig Konter verhinderst.'
+                            },
+                            'Mixed Style': {
+                                titel: 'Mixed Style',
+                                beschreibung: 'Ein Mixed Style ist der typische Allrounder, der jeder High-Rank Spieler versucht zu sein. Durch eine Kombination aus offensiven und defensiven Soloaktionen versuchst du einen oder mehrere Gegner zu überwinden und so deinen Mitspielern das Spiel so einfach wie möglich zu machen. Du sammelst Punkte in allen Stats durch lange Clears, Saves und eigenen Schüssen. Gerade im Solo-Queue ist dieser adaptive Spielstil erfolgreich und ist typisch für viele professionelle Spieler.'
+                            }
+                        };
+
                         const maxValue = Math.max(...data.values);
                         const maxIndex = data.values.indexOf(maxValue);
                         const maxLabel = data.labels[maxIndex];
@@ -359,6 +378,21 @@
                         resultText.textContent = `Du bist zu ${percentage}% ${maxLabel}`;
 
                         playerStatsResult.appendChild(resultText);
+
+                        // Beschreibungstext zum Spielstil einfügen
+                        const stilInfo = spielstilTexte[maxLabel];
+                        if (stilInfo) {
+                            const beschreibungText = document.createElement('div');
+                            beschreibungText.style.marginTop = '10px';
+                            beschreibungText.style.color = '#dddddd';
+
+                            beschreibungText.innerHTML = `
+                                <h4 style="color:#ffffff; margin-bottom:5px;">${stilInfo.titel}</h4>
+                                <p style="margin:0;">${stilInfo.beschreibung}</p>
+                            `;
+
+                            playerStatsResult.appendChild(beschreibungText);
+                        }
 
                         } catch (error) {
                             console.error("Fehler in loadPlayerStats:", error);
