@@ -106,6 +106,7 @@
     </form>
 
     {% if player_name and cats %}
+    <br>
       <h2>Ähnliche Spieler zu {{ player_name }}</h2>
       {% for category, players in cats.items() %}
         <h3>{{ category|capitalize }}</h3>
