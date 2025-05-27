@@ -11,7 +11,7 @@ DB_CONFIG = {
     'port': 5432
 }
 
-CSV_FILE_REPLAYS = './Replays/matches.csv'
+CSV_FILE_REPLAYS = './Code/matches.csv'
 CSV_FILE_PLAYER = './DASC/player_probs.csv'
 GRAPH_FOLDER = './plots'
 TABLE_NAME_REPLAYS = 'replay_stats'
