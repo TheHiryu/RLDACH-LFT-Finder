@@ -109,7 +109,7 @@
           <div class="rich-text w-richtext">
             <h1 style="background-color: transparent;">Spielerstatistiken suchen</h1>
 
-            <form id="playerSearchForm" autocomplete="off">
+            <form id="playerSearchForm" method="GET" action="/spielerstatistiken" autocomplete="off">
                 <div class="autocomplete-container">
                     <label for="playerName" style="display:block; margin-bottom:5px; color: #f0f0f0;">Spielername:</label>
                     <input type="text" id="playerName" name="playerName" placeholder="Spielernamen eingeben...">
@@ -117,7 +117,30 @@
                 </div>
                 <button type="submit" id="submitPlayer">Suchen</button>
             </form>
+            {% if cats %}
+            <h3>Ähnliche Spieler zu: {{ player_name }}</h3>
 
+            <h4>Nearest (Ähnlichste Spieler)</h4>
+            <ul>
+                {% for player in cats['nearest'] %}
+                <li>{{ player['player_name'] }} (Distanz: {{ "%.2f"|format(player['distance']) }})</li>
+                {% endfor %}
+            </ul>
+
+            <h4>Neutral</h4>
+            <ul>
+                {% for player in cats['neutral'] %}
+                <li>{{ player['player_name'] }} (Distanz: {{ "%.2f"|format(player['distance']) }})</li>
+                {% endfor %}
+            </ul>
+
+            <h4>Opposite</h4>
+            <ul>
+                {% for player in cats['opposite'] %}
+                <li>{{ player['player_name'] }} (Distanz: {{ "%.2f"|format(player['distance']) }})</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
             <section class="content-box-style">
                 <h3>Info:</h3>
                 <p>
@@ -135,6 +158,31 @@
             <div id="playerStatsResult" class="content-box-style">
                 <p>Suche nach einem Spieler, um relevante Statistiken anzuzeigen.</p>
             </div>
+
+                        {% if cats %}
+            <h3>Ähnliche Spieler zu: {{ player_name }}</h3>
+
+            <h4>Nearest (Ähnlichste Spieler)</h4>
+            <ul>
+                {% for player in cats['nearest'] %}
+                <li>{{ player['player_name'] }} (Distanz: {{ "%.2f"|format(player['distance']) }})</li>
+                {% endfor %}
+            </ul>
+
+            <h4>Neutral</h4>
+            <ul>
+                {% for player in cats['neutral'] %}
+                <li>{{ player['player_name'] }} (Distanz: {{ "%.2f"|format(player['distance']) }})</li>
+                {% endfor %}
+            </ul>
+
+            <h4>Opposite</h4>
+            <ul>
+                {% for player in cats['opposite'] %}
+                <li>{{ player['player_name'] }} (Distanz: {{ "%.2f"|format(player['distance']) }})</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
 
             <script>
                 const playerNameInput = document.getElementById('playerName');

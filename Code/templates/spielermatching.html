@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block wf_page_id %}spielerstatistiken_simple_page_id{% endblock %}
+{% block title %}Spielerstatistiken{% endblock %}
+
+{% block meta_tags %}
+  <meta content="Spielerstatistiken Seite" property="og:title">
+  <meta content="Alle relevanten Statistiken eines Spielers" property="twitter:title">
+{% endblock %}
+
+{% block extra_css %}
+  <style>
+    .content-box {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: rgba(20,20,30,0.7);
+      border-radius: 8px;
+      color: #f0f0f0;
+    }
+    form {
+      margin-bottom: 20px;
+    }
+    input[type="text"] {
+      width: 30%;
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid #555;
+      background-color: rgba(40,40,60,0.8);
+      color: #fff;
+    }
+    button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      background-color: #007bff;
+      color: #fff;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #444;
+      text-align: left;
+    }
+    th {
+      background-color: rgba(30,30,45,0.9);
+      color: #ffffff;
+    }
+    td {
+      color: #e0e0e0;
+    }
+    h2, h3 {
+      color: #ffffff;
+      margin-top: 25px;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <section class="content-box">
+    <h1>Spielerstatistiken</h1>
+    <form method="GET" action="/tinder">
+      <label for="playerName">Spielername:</label>
+      <input type="text" id="playerName" name="playerName" placeholder="Spielernamen eingeben..." required>
+      <button type="submit">Suchen</button>
+    </form>
+
+    {% if player_name and cats %}
+      <h2>Ähnliche Spieler zu {{ player_name }}</h2>
+      {% for category, players in cats.items() %}
+        <h3>{{ category|capitalize }}</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Distanz</th>
+              <th>Ähnlichkeit</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in players %}
+              <tr>
+                <td>{{ p.name or ('ID: ' ~ p.player_id) }}</td>
+                <td>{{ "%.2f"|format(p.distance) }}</td>
+                <td>{{ "%.2f"|format(p.similarity) }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% endfor %}
+    {% elif player_name %}
+      <p>Für '{{ player_name }}' wurden keine Daten gefunden.</p>
+    {% else %}
+      <p>Bitte gib einen Spielernamen ein, um die Statistiken anzuzeigen.</p>
+    {% endif %}
+  </section>
+{% endblock %}
