@@ -1,34 +1,34 @@
 {% extends "base.html" %}
 
-{% block wf_page_id %}spielermatching_page_id{% endblock %} 
-{% block title %}Spielermatching{% endblock %}
+{% block wf_page_id %}quotenmacher_page{% endblock %}
+{% block title %}Quotenmacher – Spielermatching{% endblock %}
 
 {% block meta_tags %}
-  <meta content="Spielermatching Seite" property="og:title">
-  <meta content="Stelle dein Team zusammen" property="twitter:title">
+  <meta content="Quotenmacher für Spielermatching" property="og:title">
+  <meta content="Stelle dein Team zusammen und erhalte die Gewinnwahrscheinlichkeit" property="twitter:title">
 {% endblock %}
 
 {% block extra_css %}
+
 <style>
     .spielermatching-container {
         display: flex;
-        flex-wrap: wrap; 
+        flex-wrap: wrap;
         justify-content: space-around;
-        align-items: flex-start; 
-        max-width: 1200px; 
-        margin: 20px auto; 
-        padding: 15px;   
+        align-items: flex-start;
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 15px;
     }
 
     .team-column {
         flex: 1;
-        min-width: 300px; 
-        max-width: 550px; 
-        margin: 10px; 
-        
+        min-width: 300px;
+        max-width: 550px;
+        margin: 10px;
         background-color: rgba(20,20,30,0.7);
         padding: 25px;
-        border-radius: 10px; 
+        border-radius: 10px;
         color: #f0f0f0;
         box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     }
@@ -37,7 +37,7 @@
         color: #ffffff;
         text-align: center;
         margin-top: 0;
-        margin-bottom: 25px; 
+        margin-bottom: 25px;
     }
 
     .player-input-group {
@@ -47,7 +47,7 @@
     .player-input-group label {
         display: block;
         margin-bottom: 8px;
-        font-weight: 500; 
+        font-weight: 500;
         font-size: 0.95rem;
     }
 
@@ -56,14 +56,14 @@
         width: 100%;
     }
 
-    .player-input { 
+    .player-input {
         width: 100%;
         padding: 15px;
-        font-size: 1rem; 
+        font-size: 1rem;
         line-height: 1.4;
-        border-radius: 8px; 
+        border-radius: 8px;
         border: 1px solid #555;
-        background-color: rgba(40, 40, 60, 0.8); 
+        background-color: rgba(40, 40, 60, 0.8);
         color: #ffffff;
         box-sizing: border-box;
     }
@@ -99,9 +99,9 @@
     .autocomplete-active { background-color: #007bff !important; color: #ffffff !important; }
 
     .submit-button-container {
-        width: 100%; 
-        text-align: center; 
-        margin-top: 30px; 
+        width: 100%;
+        text-align: center;
+        margin-top: 30px;
     }
 
     button#submitTeams {
@@ -113,313 +113,142 @@
         border-radius: 8px;
         font-size: 1.1rem;
         font-weight: 500;
-        display: inline-block; 
+        display: inline-block;
     }
     button#submitTeams:hover { background-color: #0056b3; }
-    #confirmationMessage { margin-top: 15px; font-weight: bold;  }
-
+    #confirmationMessage { margin-top: 15px; font-weight: bold; }
 </style>
 {% endblock %}
 
-
 {% block content %}
-<div class="spielermatching-container">
+<form method="post">
+  <div class="spielermatching-container">
     <div class="team-column">
-        <h2>Team 1</h2>
-        <div id="team1">
-            <div class="player-input-group">
-                <label for="t1p1">Spieler 1:</label>
-                <div class="autocomplete-container">
-                    <input type="text" id="t1p1" class="player-input" data-team="1" data-player-index="0" placeholder="Spieler suchen...">
-                    <div id="suggestions-t1p1" class="autocomplete-suggestions"></div>
-                </div>
-            </div>
-            <div class="player-input-group">
-                <label for="t1p2">Spieler 2:</label>
-                <div class="autocomplete-container">
-                    <input type="text" id="t1p2" class="player-input"  data-team="1" data-player-index="1" placeholder="Spieler suchen...">
-                    <div id="suggestions-t1p2" class="autocomplete-suggestions"></div>
-                </div>
-            </div>
-            <div class="player-input-group">
-                <label for="t1p3">Spieler 3:</label>
-                <div class="autocomplete-container">
-                    <input type="text" id="t1p3" class="player-input" data-team="1" data-player-index="2" placeholder="Spieler suchen...">
-                    <div id="suggestions-t1p3" class="autocomplete-suggestions"></div>
-                </div>
-            </div>
+      <h2>Team 1</h2>
+      {% for i in range(3) %}
+      <div class="player-input-group">
+        <label for="team1_player{{i+1}}">Spieler {{i+1}}:</label>
+        <div class="autocomplete-container">
+          <input type="text" id="team1_player{{i+1}}" name="team1_player{{i+1}}" class="player-input"
+                 data-team="0" data-player-index="{{i}}" placeholder="Spieler suchen..."
+                 value="{{ request.form.get('team1_player' ~ (i+1), '') }}">
+          <div id="suggestions-team1_player{{i+1}}" class="autocomplete-suggestions"></div>
         </div>
+      </div>
+      {% endfor %}
     </div>
 
     <div class="team-column">
-        <h2>Team 2</h2>
-        <div id="team2">
-            <div class="player-input-group">
-                <label for="t2p1">Spieler 1:</label>
-                <div class="autocomplete-container">
-                    <input type="text" id="t2p1" class="player-input"  data-team="2" data-player-index="0" placeholder="Spieler suchen...">
-                    <div id="suggestions-t2p1" class="autocomplete-suggestions"></div>
-                </div>
-            </div>
-            <div class="player-input-group">
-                <label for="t2p2">Spieler 2:</label>
-                <div class="autocomplete-container">
-                    <input type="text" id="t2p2" class="player-input"  data-team="2" data-player-index="1" placeholder="Spieler suchen...">
-                    <div id="suggestions-t2p2" class="autocomplete-suggestions"></div>
-                </div>
-            </div>
-            <div class="player-input-group">
-                <label for="t2p3">Spieler 3:</label>
-                <div class="autocomplete-container">
-                    <input type="text" id="t2p3" class="player-input"  data-team="2" data-player-index="2" placeholder="Spieler suchen...">
-                    <div id="suggestions-t2p3" class="autocomplete-suggestions"></div>
-                </div>
-            </div>
+      <h2>Team 2</h2>
+      {% for i in range(3) %}
+      <div class="player-input-group">
+        <label for="team2_player{{i+1}}">Spieler {{i+1}}:</label>
+        <div class="autocomplete-container">
+          <input type="text" id="team2_player{{i+1}}" name="team2_player{{i+1}}" class="player-input"
+                 data-team="1" data-player-index="{{i}}" placeholder="Spieler suchen..."
+                 value="{{ request.form.get('team2_player' ~ (i+1), '') }}">
+          <div id="suggestions-team2_player{{i+1}}" class="autocomplete-suggestions"></div>
         </div>
+      </div>
+      {% endfor %}
     </div>
+  </div>
+
+  <div class="submit-button-container">
+    <button type="submit" id="submitTeams">Wahrscheinlichkeit berechnen</button>
+  </div>
+</form>
+
+{% if probability is defined and probability is not none %}
+<div class="submit-button-container">
+  <div id="confirmationMessage" style="color:green; font-weight:bold; margin-top:20px;">
+    Gewinnwahrscheinlichkeit Team 1 (Blau): {{ (probability * 100) | round(1) }} %
+  </div>
 </div>
-
-<div class="submit-button-container"> 
-    <button id="submitTeams">Zusammenstellung bestätigen</button>
-    <div id="confirmationMessage"></div>
+{% elif get_flashed_messages() %}
+<div class="submit-button-container">
+  {% for msg in get_flashed_messages(category_filter=['error']) %}
+  <div id="confirmationMessage" style="color:red; font-weight:bold; margin-top:20px;">
+    {{ msg }}
+  </div>
+  {% endfor %}
 </div>
+{% endif %}
 
-    <script>
+<script>
+  // komplette Autocomplete- und Fetch-Logik wie vorher, nur ohne fetch('/api/predict')
+  // da wir über Form-POST arbeiten
+  const playerInputs = document.querySelectorAll('.player-input');
+  let debounceTimer, currentFocus = -1;
+  const selectedPlayers = new Set();
+  const currentValues = {};
 
-        const playerInputs = document.querySelectorAll('.player-input');
-        const selectedPlayers = new Set(); 
-        const currentValues = {}; 
+  playerInputs.forEach(input => {
+    currentValues[input.name] = input.value.toLowerCase();
+    input.addEventListener('input', e => onInput(e, input));
+    input.addEventListener('keydown', e => onKeyDown(e, input));
+    input.addEventListener('focus', () => currentFocus = -1);
+  });
 
-        let debounceTimer;
-        let activeAutocompleteContainer = null; 
-        let currentFocus = -1; 
+  document.addEventListener('click', e => {
+    if (!e.target.classList.contains('player-input')) closeAllLists();
+  });
 
-        playerInputs.forEach(inputField => {
-            const suggestionsContainerId = `suggestions-${inputField.id}`;
-            const suggestionsContainer = document.getElementById(suggestionsContainerId);
-            if (!suggestionsContainer) { 
-                console.error(`[InitError] Suggestions-Container mit ID ${suggestionsContainerId} nicht gefunden!`);
-                return; 
-            }
-            currentValues[inputField.id] = ""; 
+  async function onInput(e, input) {
+    const val = input.value.trim();
+    const container = document.getElementById('suggestions-' + input.id);
+    clearTimeout(debounceTimer);
+    container.innerHTML = '';
+    currentFocus = -1;
+    if (val.length < 1) return;
+    debounceTimer = setTimeout(async () => {
+      const res = await fetch(`/api/player_suggestions?q=${encodeURIComponent(val)}`);
+      const list = await res.json();
+      renderSuggestions(list, input, container);
+    }, 300);
+  }
 
-            inputField.addEventListener('focus', function() {
-                activeAutocompleteContainer = suggestionsContainer; 
-                closeAllLists(suggestionsContainer, "[FocusEvent]"); 
-                if (this.value.length > 0) { 
-                    triggerSuggestions(this, suggestionsContainer);
-                }
-            });
+  function renderSuggestions(list, input, container) {
+    container.innerHTML = '';
+    list.filter(name => {
+      const low = name.toLowerCase();
+      return low === currentValues[input.name] || !selectedPlayers.has(low);
+    }).forEach(name => {
+      const div = document.createElement('div');
+      div.innerHTML = name.replace(new RegExp(`(${input.value})`, 'gi'), '<strong>$1</strong>');
+      div.addEventListener('click', () => selectSuggestion(name, input));
+      container.appendChild(div);
+    });
+  }
 
-            inputField.addEventListener('input', function() {
-                const inputValue = this.value;
-                clearTimeout(debounceTimer);
-                suggestionsContainer.innerHTML = ''; 
-                activeAutocompleteContainer = suggestionsContainer; 
-                currentFocus = -1;
-                
-                if (inputValue.length === 0) { 
-                    const previouslySelected = currentValues[this.id];
-                    if (previouslySelected) {
-                        selectedPlayers.delete(previouslySelected.toLowerCase());
-                        currentValues[this.id] = "";
-                    }
-                    return; 
-                }
-                
-                const minSearchLength = 1; 
-                if (inputValue.length < minSearchLength) { 
-                    return;
-                }
+  function onKeyDown(e, input) {
+    const container = document.getElementById('suggestions-' + input.id);
+    let items = container.getElementsByTagName('div');
+    if (!items.length) return;
+    if (e.keyCode === 40) { currentFocus = (currentFocus + 1) % items.length; addActive(items); }
+    else if (e.keyCode === 38) { currentFocus = (currentFocus - 1 + items.length) % items.length; addActive(items); }
+    else if (e.keyCode === 13) { e.preventDefault(); if (items[currentFocus]) items[currentFocus].click(); }
+  }
 
-                debounceTimer = setTimeout(() => {
-                    triggerSuggestions(this, suggestionsContainer, inputValue);
-                }, 300);
-            });
+  function addActive(items) {
+    removeActive(items);
+    if (items[currentFocus]) items[currentFocus].classList.add('autocomplete-active');
+  }
 
-            inputField.addEventListener('keydown', function(e) {
-                handleKeyDown(e, this, suggestionsContainer);
-            });
+  function removeActive(items) {
+    Array.from(items).forEach(i => i.classList.remove('autocomplete-active'));
+  }
 
-            inputField.addEventListener('change', function() {
-                if (this.value === "" && currentValues[this.id]) {
-                    selectedPlayers.delete(currentValues[this.id].toLowerCase());
-                    currentValues[this.id] = "";
-                }
-            });
-        });
+  function closeAllLists() {
+    document.querySelectorAll('.autocomplete-suggestions').forEach(c => c.innerHTML = '');
+  }
 
-        async function triggerSuggestions(inputElement, suggestionsContainer, query) {
-            if (query === undefined) query = inputElement.value;
-            if (query.length < 1) {
-                suggestionsContainer.innerHTML = '';
-                return;
-            }
-            activeAutocompleteContainer = suggestionsContainer;
-
-            try {
-                const fetchURL = `/api/player_suggestions?q=${encodeURIComponent(query)}`;
-                const response = await fetch(fetchURL);
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
-                }
-                
-                let serverSuggestions = await response.json();
-                
-                if (activeAutocompleteContainer !== suggestionsContainer) {
-                    return;
-                }
-                suggestionsContainer.innerHTML = '';
-
-                const valueInThisInputLower = currentValues[inputElement.id]?.toLowerCase() || "";
-                const filteredSuggestions = serverSuggestions.filter(serverName => {
-                    const serverNameLower = serverName.toLowerCase();
-                    const isCurrentValueInThisField = serverNameLower === valueInThisInputLower;
-                    const isNotSelectedElsewhere = !selectedPlayers.has(serverNameLower);
-                    return isCurrentValueInThisField || isNotSelectedElsewhere;
-                });
-
-                if (filteredSuggestions.length === 0 && query.length > 0) {
-                    const noSuggestionDiv = document.createElement('div');
-                    noSuggestionDiv.textContent = 'Keine passenden Spieler verfügbar';
-                    noSuggestionDiv.style.padding = '10px';
-                    noSuggestionDiv.style.color = '#aaa';
-                    suggestionsContainer.appendChild(noSuggestionDiv);
-                    return;
-                }
-
-                filteredSuggestions.forEach(name => {
-                    const suggestionDiv = document.createElement('div');
-                    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-                    suggestionDiv.innerHTML = name.replace(regex, '<strong>$1</strong>');
-                    
-                    suggestionDiv.addEventListener('click', function() {
-                        const oldNameInFieldLower = currentValues[inputElement.id]?.toLowerCase();
-                        if (oldNameInFieldLower && oldNameInFieldLower !== name.toLowerCase()) {
-                            selectedPlayers.delete(oldNameInFieldLower);
-                        }
-                        
-                        inputElement.value = name;
-                        currentValues[inputElement.id] = name; 
-                        selectedPlayers.add(name.toLowerCase()); 
-                        closeAllLists("[SuggestionClickEvent]");
-                    });
-                    suggestionsContainer.appendChild(suggestionDiv);
-                });
-            } catch (error) {
-                console.error(`Fehler in triggerSuggestions für Feld ${inputElement.id}:`, error);
-                if (activeAutocompleteContainer === suggestionsContainer) {
-                    suggestionsContainer.innerHTML = '<div style="padding:10px; color:#ffaaaa;">Fehler beim Laden.</div>';
-                }
-            }
-        }
-
-        function handleKeyDown(e, inputElement, suggestionsContainer) {
-            let items = suggestionsContainer.getElementsByTagName("div");
-            if (items.length === 1 && items[0].textContent === 'Keine passenden Spieler verfügbar' && e.keyCode !== 27) {
-                if(e.keyCode === 13) e.preventDefault();
-                return;
-            }
-            if (items.length === 0 && e.keyCode !== 27 && e.keyCode !== 13) return;
-
-            if (e.keyCode == 40) { 
-                currentFocus++;
-                addActive(items);
-            } else if (e.keyCode == 38) { 
-                currentFocus--;
-                addActive(items);
-            } else if (e.keyCode == 13) { 
-                e.preventDefault();
-                if (currentFocus > -1) {
-                    if (items[currentFocus]) items[currentFocus].click();
-                }
-            } else if (e.keyCode == 27) { 
-                closeAllLists("[EscapeKey]");
-            }
-        }
-
-        function addActive(items) {
-            if (!items || items.length === 0) return false;
-            removeActive(items);
-            if (currentFocus >= items.length) currentFocus = 0;
-            if (currentFocus < 0) currentFocus = (items.length - 1);
-            if (items[currentFocus]) { 
-                items[currentFocus].classList.add("autocomplete-active");
-                items[currentFocus].scrollIntoView({ behavior: 'auto', block: 'nearest' });
-            }
-        }
-
-        function removeActive(items) {
-            for (var i = 0; i < items.length; i++) {
-                if (items[i]) items[i].classList.remove("autocomplete-active");
-            }
-        }
-
-        function closeAllLists(source = "[Unknown]", exceptThisContainer = null) { 
-            const allSuggestionContainers = document.querySelectorAll('.autocomplete-suggestions');
-            allSuggestionContainers.forEach(container => {
-                if (container !== exceptThisContainer) {
-                    container.innerHTML = '';
-                }
-            });
-            if (exceptThisContainer === null) {
-                 currentFocus = -1; 
-                 activeAutocompleteContainer = null; 
-            }
-        }
-        
-        document.addEventListener('click', function (e) {
-            let clickedInsideAnAutocompleteWidget = false;
-            playerInputs.forEach(inputField => {
-                const suggestionsBox = document.getElementById(`suggestions-${inputField.id}`);
-                if (inputField.contains(e.target) || (suggestionsBox && suggestionsBox.contains(e.target))) {
-                    clickedInsideAnAutocompleteWidget = true;
-                }
-            });
-            if (!clickedInsideAnAutocompleteWidget) {
-                closeAllLists("[GlobalClickEvent]");
-            }
-        });
-        
-        document.getElementById('submitTeams').addEventListener('click', function() {
-            const teamsData = { team1: [], team2: [] };
-            let allFieldsAreFilled = true; 
-            const tempSelectedInForm = new Set();
-            let duplicateInForm = false;
-
-            playerInputs.forEach(input => {
-                const val = input.value.trim();
-                if (val === "") {
-                    allFieldsAreFilled = false; // Wenn auch nur ein Feld leer ist
-                } else {
-                    if (tempSelectedInForm.has(val.toLowerCase())) {
-                        duplicateInForm = true;
-                    }
-                    tempSelectedInForm.add(val.toLowerCase());
-                }
-                if (input.closest('#team1')) {
-                    teamsData.team1.push(val);
-                } else {
-                    teamsData.team2.push(val);
-                }
-            });
-            
-            const confirmationMessageEl = document.getElementById('confirmationMessage');
-            if (!allFieldsAreFilled) {
-                confirmationMessageEl.textContent = "Bitte füllen Sie alle 6 Spielerfelder aus.";
-                confirmationMessageEl.style.color = "red";
-                return;
-            }
-             if (duplicateInForm) {
-                 confirmationMessageEl.textContent = "Fehler: Ein Spieler wurde mehrfach ausgewählt. Bitte korrigieren.";
-                 confirmationMessageEl.style.color = "red";
-                 return;
-            }
-
-            console.log("Abgesendete Teams:", teamsData);
-            confirmationMessageEl.textContent = "Teams erfolgreich validiert (siehe Konsole)!";
-            confirmationMessageEl.style.color = "green";
-        });
-    </script>
+  function selectSuggestion(name, input) {
+    if (currentValues[input.name]) selectedPlayers.delete(currentValues[input.name]);
+    input.value = name;
+    currentValues[input.name] = name.toLowerCase();
+    selectedPlayers.add(name.toLowerCase());
+    closeAllLists();
+  }
+</script>
 {% endblock %}

@@ -10,8 +10,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import pairwise_distances
 import joblib
-
-
+import re
 app = Flask(__name__)
 app.secret_key = os.urandom(42)
 
@@ -44,10 +43,144 @@ def route_spielerklassifikation():
     # Erstellen Sie eine Datei templates/spielerklassifikation.html
     return render_template('spielerklassifikation.html', page_id="spielerklassifikation_page", site_id="main_site")
 
-@app.route('/quotenmacher')
-def route_quotenmacher():
 
-    return render_template('quotenmacher.html', page_id="quotenmacher_page", site_id="main_site")
+
+
+# --- Daten laden (einmalig) ---
+DF_PROFILES_PATH = "df_profiles.csv"     # bleibt für get_six_player_inputs
+ELO_DF_PATH      = "elo_df.csv"
+MODEL_PATH       = "rocket_league_winner_model.pkl"
+MATCHES_PATH     = "matches.csv"         # neues CSV mit player_name und player_id
+
+df_profiles = pd.read_csv(DF_PROFILES_PATH)
+elo_df      = pd.read_csv(ELO_DF_PATH)
+model       = joblib.load(MODEL_PATH)
+
+# das DataFrame für Namen → ID
+df_matches  = pd.read_csv(MATCHES_PATH)
+
+
+# --- Hilfsfunktion wie gehabt ---
+def get_six_player_inputs(player_ids, df_profiles, elo_df, model_path):
+    # --- 1) Letzte Profil- und Elo-Daten je Spieler wie gehabt ---
+    prof_latest = (
+        df_profiles[df_profiles['player_id'].isin(player_ids)]
+        .sort_values('match_id')
+        .groupby('player_id').tail(1)
+        [['player_id','team_color_bin',
+          'prob_cluster_0','prob_cluster_1',
+          'prob_cluster_2','prob_cluster_3']]
+        .set_index('player_id')
+    )
+    elo_latest = (
+        elo_df[elo_df['player_id'].isin(player_ids)]
+        .sort_values('match_id')
+        .groupby('player_id').tail(1)
+        [['player_id','new_elo',
+          'momentum_3','momentum_5',
+          'momentum_10','momentum_20']]
+        .set_index('player_id')
+    )
+
+    # --- 2) Zusammenführen und Reindex auf alle gewünschten player_ids ---
+    merged = prof_latest.join(elo_latest, how='outer')\
+                        .reindex(player_ids)
+
+    # --- 3) Fehlende Werte mit Default füllen (z.B. ELO=1500, Momentum=0, Cluster=1/4) ---
+    merged['team_color_bin'] = merged['team_color_bin'].fillna(0).astype(int)
+    merged['new_elo']         = merged['new_elo'].fillna(1500)
+    for col in ['momentum_3','momentum_5','momentum_10','momentum_20']:
+        merged[col] = merged[col].fillna(0)
+    # gleichverteilte Cluster-Probs, falls fehlen
+    for col in ['prob_cluster_0','prob_cluster_1','prob_cluster_2','prob_cluster_3']:
+        merged[col] = merged[col].fillna(0.25)
+
+    # --- 4) Feature-Dict wie gehabt ---
+    feats = {}
+    feature_cols = [
+        'new_elo','momentum_3','momentum_5',
+        'momentum_10','momentum_20',
+        'prob_cluster_0','prob_cluster_1',
+        'prob_cluster_2','prob_cluster_3'
+    ]
+
+    for pos, pid in enumerate(player_ids):
+        row = merged.loc[pid]
+        team = int(row['team_color_bin'])
+        idx  = pos % 3
+        for feat in feature_cols:
+            feats[f"T{team}_P{idx}_{feat}"] = row[feat]
+
+    X_new = pd.DataFrame([feats])
+
+    # --- 5) Mapping auf trainierte Features und Reindex with zeros ---
+    model = joblib.load(model_path)
+    pattern = re.compile(r"^T(?P<feat>.+)_P(?P<team>\d+)_(?P<idx>\d+)$")
+    mapping = {
+        f"T{m.group('team')}_P{m.group('idx')}_{m.group('feat')}": name
+        for name in model.feature_names_in_
+        if (m := pattern.match(name))
+    }
+
+    X_matched  = X_new.rename(columns=mapping)
+    X_complete = X_matched.reindex(
+        columns=model.feature_names_in_, fill_value=0
+    )
+
+    # --- 6) Vorhersage ---
+    proba_blue = model.predict_proba(X_complete)[0, 1]
+    return proba_blue
+
+@app.route('/quotenmacher', methods=['GET', 'POST'])
+def route_quotenmacher():
+    probability = None
+
+    if request.method == 'POST':
+        # 1) Lese alle sechs Namen ein
+        names = [
+            request.form.get(f'team1_player{i+1}', '').strip()
+            for i in range(3)
+        ] + [
+            request.form.get(f'team2_player{i+1}', '').strip()
+            for i in range(3)
+        ]
+
+        # 2) Baue Mapping aus matches.csv: name.lower() → player_id
+        #    Annahme: df_matches hat Spalten 'player_name' und 'player_id'
+        name_to_id = dict(
+            zip(
+                df_matches['name'].str.lower(),
+                df_matches['player_id']
+            )
+        )
+
+        try:
+            player_ids = [name_to_id[n.lower()] for n in names]
+        except KeyError as e:
+            flash(f"Spieler „{e.args[0]}“ nicht gefunden.", "error")
+            return render_template('quotenmacher.html', page_id="quotenmacher_page")
+
+        # 3) Rufe Dein Modell auf
+        probability = get_six_player_inputs(player_ids, df_profiles, elo_df, MODEL_PATH)
+
+
+    # 4) Rendern
+    return render_template(
+        'quotenmacher.html',
+        page_id="quotenmacher_page",
+        probability=probability
+    )
+
+
+
+
+
+
+#===================================
+
+
+
+
 
 
 @app.route('/spielerstatistiken', methods=["GET", "POST"]) # Die Route für Spielerstatistiken, die im Header links verlinkt ist
@@ -238,7 +371,7 @@ def get_player_id(cur, player_name):
 
 
 
-
+#===================================
 
 
 
