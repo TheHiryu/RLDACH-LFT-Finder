@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, jsonify
-# from discord import Webhook - Falls noch für andere Funktionen benötigt
+# from discord import Webhook
 import random
 #import json
 import psycopg2
@@ -22,8 +22,6 @@ def route_home(): # Endpunktname für url_for in base.html/_header.html/_footer.
 
 @app.route('/quotenmacher')
 def route_quotenmacher():
-    # Hier kommt die Logik für die Quotenmacher-Seite
-    # Erstellen Sie eine Datei templates/quotenmacher.html
     return render_template('quotenmacher.html', page_id="quotenmacher_page", site_id="main_site")
 
 
@@ -34,8 +32,6 @@ def route_spielerstatistiken():
 
 @app.route('/stats') # Die Route für Statistiken, die im Header rechts verlinkt ist
 def route_stats():
-    # Ihre bestehende statistiken_seite Funktion wurde umbenannt und hier integriert
-    # Erstellen Sie eine Datei templates/stats.html (oder benennen Sie spielerstatistiken.html um)
     return render_template('stats.html', page_id="stats_page", site_id="main_site")
 
 
@@ -72,7 +68,7 @@ def player_stats():
         
         conn = psycopg2.connect(**DB_CONFIG)
         cur = conn.cursor()
-    
+
         cur.execute("""
                     SELECT player_id 
                     FROM replay_stats
@@ -81,7 +77,7 @@ def player_stats():
 
         result = cur.fetchone()
 
-        player_id = result[0]
+        player_id = get_player_id(cur, player_name)
 
         if result is None:
             return jsonify({'error': 'Spielername nicht gefunden'}), 404
@@ -108,6 +104,18 @@ def player_stats():
     except Exception as e:
         print(f"Fehler bei DB-Zugriff: {e}")
         return jsonify({'error': f"Fehler bei DB-Zugriff: {e}"}), 500
+
+
+def get_player_id(cur, player_name):
+        cur.execute("""
+                    SELECT player_id 
+                    FROM replay_stats
+                    WHERE name = %s
+                    """, (player_name,))
+
+        result = cur.fetchone()
+
+        return result[0]
 
 
 if __name__ == '__main__':
