@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de" data-wf-page="{% block wf_page_id %}{% endblock %}" data-wf-site="{% block wf_site_id %}670ff57a908d3c09f57b1756{% endblock %}"> {# wf_site_id kann hier bleiben, wf_page_id wird von jeder Seite gesetzt #}
+<html lang="de" data-wf-page="{% block wf_page_id %}{% endblock %}" data-wf-site="{% block wf_site_id %}670ff57a908d3c09f57b1756{% endblock %}"> 
 <head>
   <meta charset="utf-8">
   <title>RocketLeague Stats</title>
@@ -27,7 +27,7 @@
 </head>
 <body>
   <div class="page-wrap">
-    {% include '_header.html' %} {# Hier wird der Header eingefügt #}
+    {% include '_header.html' %}
 
     <main role="main" class="content-wrapper"> 
       {% block content %}
@@ -35,7 +35,5 @@
   </main>
     {% include '_footer.html' %} 
   </div>
-  
-  {% block extra_js %}{% endblock %} {# Block für seitenspezifisches JavaScript #}
 </body>
 </html>
